@@ -89,6 +89,7 @@ h2 {
   color: #FFFFFF;
   animation: fadein 2s;
   position: relative;
+  width: 98%;
 }
 
 .alert-success {

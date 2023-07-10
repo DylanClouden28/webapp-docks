@@ -53,13 +53,24 @@ header {
   padding: 10px;
 }
 
-button#home-btn, #back-btn {
+#home-btn, #back-btn {
   font-size: 18px;
   background-color: #00adb5;
   color: #eeeeee;
   padding: 5px 10px;
   border: none;
   cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#home-btn:hover {
+  background-color: #009e9a;
+  transform: scale(1.05);
+}
+
+#home-btn:active {
+  background-color: #00756e;
 }
 
 button#home-btn:hover {

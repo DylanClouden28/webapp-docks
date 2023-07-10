@@ -27,7 +27,6 @@ const phoneNumberInput = document.getElementById('phone-number');
 const boatNameInput = document.getElementById('boat-name');
 const resultsTableBody = document.getElementById('results').getElementsByTagName('tbody')[0];
 
-const homeButton = document.getElementById('home-btn');
 
 function search() {
     const boatReg = boatRegInput.value;
@@ -70,8 +69,5 @@ function createBoatInfoLink(item, text) {
     return link;
   }
 
-homeButton.addEventListener('click', () => {
-    window.location.href = 'index.html';
-});
 
 search();
