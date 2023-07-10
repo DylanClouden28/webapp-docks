@@ -1,0 +1,183 @@
+/* General styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background-color: #222831;
+  color: #eeeeee;
+}
+
+/* Index.html styles */
+#container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-gap: 20px;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.large-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #252121;
+  background-color: #393e46;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: inherit;
+  text-decoration: none;
+}
+
+
+
+.large-btn:hover {
+  background-color: #4e535a;
+}
+
+.large-btn:active {
+  background-color: #2d3238;
+}
+
+/* Signin.html styles */
+header {
+  display: flex;
+  justify-content: flex-start;
+  padding: 10px;
+}
+
+button#home-btn, #back-btn {
+  font-size: 18px;
+  background-color: #00adb5;
+  color: #eeeeee;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+button#home-btn:hover {
+  background-color: #009e9a;
+}
+
+button#home-btn:active {
+  background-color: #00756e;
+}
+
+#search-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+input[type="text"] {
+  margin: 5px;
+  width: 100%;
+  max-width: 300px;
+}
+
+table {
+  background-color: #393e46;
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #00adb5;
+}
+
+tr:nth-child(even) {
+  background-color: #4e535a;
+}
+
+/* Add this to the existing styles.css file */
+
+/* Boatdetails.html styles */
+#details-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+label {
+  margin-top: 10px;
+}
+
+input[type="text"] {
+  margin-bottom: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+
+#date-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 20px;
+}
+
+#buttons-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 300px;
+}
+
+button {
+  font-size: 18px;
+  background-color: #00adb5;
+  color: #eeeeee;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #009e9a;
+}
+
+button:active {
+  background-color: #00756e;
+}
+
+.boat-info-row {
+  cursor: pointer;
+  position: relative;
+}
+
+.boat-info-row:hover {
+  background-color: #008b92;
+}
+
+.boat-info-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+#table-container {
+  overflow-x: auto;
+  max-height: calc(100% - 200px);
+  margin: 0 auto; 
+}
+
