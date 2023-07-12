@@ -108,6 +108,11 @@ h2 {
   cursor: pointer;
 }
 
+.form-check-input, .form-check-label {
+  display: inline-block;
+  margin-right: 10px;
+}
+
 @keyframes fadein {
     from { opacity: 0; }
     to   { opacity: 1; }

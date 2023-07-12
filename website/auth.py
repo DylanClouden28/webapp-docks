@@ -26,7 +26,7 @@ def login():
         if request.method == "POST":
             email = form.email.data
             password = form.password.data
-
+            print('hello')
             user = User.query.filter_by(email=email).first()
             if user:
                 if check_password_hash(user.password, password):

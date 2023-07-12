@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dynamic Button Expanding Page</title>
-  <link rel="stylesheet" href="static/styles.css">
-</head>
-<body>
+{% extends "base.html" %} 
+{% block title %}Home{% endblock %} 
+{%block header%}{%endblock%}
+{%block styles%}static/home-styles.css{%endblock%}
+{% block content%}
   <div id="container">
     <a href="{{ url_for('views.boatlog') }}" class="large-btn" id="boatLog">Boat Log</a>
     <button class="large-btn">Button 2</button>
@@ -15,5 +11,5 @@
     <button class="large-btn">Button 5</button>
     <button class="large-btn">Button 6</button>
   </div>
-</body>
-</html>
+{%endblock%}
+
