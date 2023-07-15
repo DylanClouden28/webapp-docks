@@ -1,0 +1,48 @@
+{% extends "base.html" %} 
+{% block title %}Search Boats{% endblock %} 
+{%block head%}<a href="{{ url_for('views.home') }}"id="home-btn">Home</a>{%endblock%}
+{%block header%}{%endblock%}
+{%block styles%}static/styles.css{%endblock%}
+{% block content%}
+  <div id="search-container">
+    <form id="search-form" method="POST">
+      <label for="boat-reg">Boat Reg.:</label>
+      <input type="text" id="boat-reg" name="boat-reg" placeholder="Search boat reg.">
+      <label for="phone-number">Phone Number:</label>
+      <input type="text" id="phone-number" name="phone-number" placeholder="Search phone number">
+      <label for="boat-name">Boat Name:</label>
+      <input type="text" id="boat-name" name="boat-name" placeholder="Search boat name">
+    </form>
+  </div>
+
+  <div id="table-container">
+    <table id="search-results">
+      <thead>
+        <tr>
+          <th>Boat Reg.</th>
+          <th>Phone Number</th>
+          <th>Boat Name</th>
+          <th>Visits</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for boat in boats %}
+        <tr>
+          <td>{{ boat.boat_reg }}</td>
+          <td>{{ boat.phone_number }}</td>
+          <td>{{ boat.boat_name }}</td>
+          <td>
+            <select>
+              {% for visit in boat.visits %}
+              <option>{{ visit }}</option>
+              {% endfor %}
+            </select>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{%endblock%}

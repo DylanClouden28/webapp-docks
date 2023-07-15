@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_wtf import FlaskForm
 from flask_login import login_required
+from sqlalchemy import or_
 from wtforms import StringField, RadioField, SubmitField
 from . import db
 from .models import Boat
@@ -18,16 +19,37 @@ class BoatLogForm(FlaskForm):
     zipcode = StringField('Zipcode or Postal Code')
     submit = SubmitField('Submit')
 
+class SearchForm
+
 
 @views.route('/')
 @login_required
 def home():
     return render_template("home.html")
 
-@views.route('/boatlog')
+@views.route('/search', methods=['GET','POST'])
 @login_required
-def boatlog():
-    return render_template("boatlog.html")
+def search():
+    form = searchForm()
+    if form.validate_on_submit():
+        if request.method == 'POST':
+            search_data = request.get_json()
+            search_reg = search_data.get('boat_reg', '')
+            search_phone = search_data.get('phone_number', '')
+            search_name = search_data.get('boat_name', '')
+            results = Boat.query.filter(
+                or_(
+                    Boat.boat_reg.like("%"+search_reg+"%"),
+                    Boat.phone_number.like("%"+search_phone+"%"),
+                    Boat.boat_name.like("%"+search_name+"%")
+                )
+            ).all()
+            results = [boat.serialize for boat in results]
+            return jsonify(results)
+    else:
+        return render_template('search.html')
+
+
 
 @views.route('/log-boat', methods=['GET', 'POST'])
 @login_required
