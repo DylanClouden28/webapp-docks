@@ -192,3 +192,63 @@ button:active {
   margin: 0 auto; 
 }
 
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 3px;
+  color: #FFFFFF;
+  animation: fadein 2s;
+  position: relative;
+  width: 98%;
+}
+
+.alert-success {
+  background-color: #4CAF50;
+}
+
+.alert-error {
+  background-color: #f44336;
+}
+
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+#button-container {
+  display: flex;
+  justify-content: center;  /* Align horizontally center */
+  align-items: center;  /* Align vertically center */
+  height: 100%;  /* Or whatever height you want for the container */
+}
+
+#login-btn {
+  font-size: 24px;
+  text-align: center;
+  background-color: #00adb5;
+  color: #eeeeee;
+  padding: 20px 40px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  border-radius: 5px;
+}
+
+#login-btn:hover {
+  background-color: #009e9a;
+  transform: scale(1.05);
+}
+
+#login-btn:active {
+  background-color: #00756e;
+}
+
+

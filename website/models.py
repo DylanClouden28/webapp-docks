@@ -1,6 +1,10 @@
 from . import db 
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+import re
+
+def sanitize(input_string):
+    return re.sub(r'\W+', '', input_string).lower()
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -11,26 +15,26 @@ class User(db.Model, UserMixin):
 
 class Boat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    #Caching aplhanumeric forms for search
     boat_reg = db.Column(db.String(150), unique=True)
+    sanitized_boat_reg = db.Column(db.String(150), unique=True)
+
     boat_name = db.Column(db.String(150))
-    boat_size = db.Column(db.Integer)
-    owner_name = db.Column(db.String(150))
+    sanitized_boat_name = db.Column(db.String(150))
+
     phone_number = db.Column(db.String(150))
+    sanitized_phone_number = db.Column(db.String(150))
+
+    owner_name = db.Column(db.String(150))
+    sanitized_owner_name = db.Column(db.String(150))
+
+    boat_size = db.Column(db.Integer)
+
+
     email = db.Column(db.String(150))
     zipcode = db.Column(db.String(150))
     visits = db.relationship('Visit')
-    def serialize(self):
-        return {
-            'id': self.id, 
-            'boat_reg': self.boat_reg,
-            'boat_name': self.boat_name,
-            'boat_size': self.boat_size,
-            'owner_name': self.owner_name,
-            'phone_number': self.phone_number,
-            'email': self.email,
-            'zipcode': self.zipcode,
-            'visits': [visit.serialize for visit in self.visits]
-        }
+    
 
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,18 +49,3 @@ class Visit(db.Model):
     unpaid_days = db.Column(db.Integer)
     unpaid_nights = db.Column(db.Integer)
     boat_id = db.Column(db.Integer, db.ForeignKey('boat.id'))
-    def serialize(self):
-        return {
-            'id': self.id, 
-            'logged_by': self.logged_by,
-            'date_in': self.date_in,
-            'date_paid': self.date_paid,
-            'paid_amount': self.paid_amount,
-            'paid_days': self.paid_days,
-            'paid_nights': self.paid_nights,
-            'paid_enw': self.paid_enw,
-            'paid_with': self.paid_with,
-            'unpaid_days': self.unpaid_days,
-            'unpaid_nights': self.unpaid_nights,
-            'boat_id': self.boat_id
-        }

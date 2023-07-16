@@ -4,20 +4,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from . import db
 from .models import User
-from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired
+from .forms import LoginForm, SignUpForm
 
 auth = Blueprint('auth', __name__)
-
-class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-
-class SignUpForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired()])
-    first_name = StringField('First Name', validators=[DataRequired()])
-    password1 = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField('Check Password', validators=[DataRequired()])
 
 @auth.route("/login", methods=['GET', 'POST'])
 def login():

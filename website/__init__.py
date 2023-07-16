@@ -4,7 +4,6 @@ from os import path
 from flask_login import LoginManager
 from website.config import SECRET_KEY
 from flask_wtf.csrf import CSRFProtect
-from flask_bootstrap import Bootstrap5
 
 db = SQLAlchemy()
 DB_NAME = 'database.db'
@@ -14,7 +13,6 @@ def create_app():
     app.config['SECRET_KEY'] = SECRET_KEY
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     csrf = CSRFProtect(app)
-    bootstrap = Bootstrap5(app)
     db.init_app(app)
     
     from .views import views
