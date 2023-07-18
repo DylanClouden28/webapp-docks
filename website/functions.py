@@ -87,6 +87,7 @@ def addBoatToDB(current_page, form):
         boat = Boat.query.filter_by(sanitized_boat_name=sanitized_boat_name).first()
     if boat:
         flash('Boat already exists', category="error")
+        return render_template(current_page, form=form)
     elif boat_reg or boat_name:
         new_boat = Boat(boat_reg=boat_reg, boat_name=boat_name, boat_size=boat_size, owner_name=owner_name, phone_number=phone_number, email=email, zipcode=zipcode, sanitized_boat_name=sanitized_boat_name, sanitized_boat_reg=sanitized_boat_reg, sanitized_owner_name=sanitized_owner_name, sanitized_phone_number=sanitized_phone_number)
         printBoat(new_boat)
