@@ -49,3 +49,11 @@ class Visit(db.Model):
     unpaid_days = db.Column(db.Integer)
     unpaid_nights = db.Column(db.Integer)
     boat_id = db.Column(db.Integer, db.ForeignKey('boat.id'))
+
+class CurrentBoats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    CurrentBoats = db.relationship('Boat')
+
+class DebtBoats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    DebtBoats = db.relationship('Boat')
