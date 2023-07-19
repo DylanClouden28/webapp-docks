@@ -35,6 +35,9 @@ def search():
 @login_required
 def log_boat():
     form = BoatLogForm()
+    form.boat_reg.data = boat_reg = request.args.get('boat_reg', '')
+    form.boat_name.data = request.args.get('boat_name', '')
+    form.phone_number.data = request.args.get('phone_number', '')
     if form.validate_on_submit():
         if request.method == "POST":
             return addBoatToDB('log-boat.html', form)

@@ -1,6 +1,7 @@
 {% extends "base.html" %} 
 {% block title %}Log Boat{% endblock %} 
 {%block header%}Log Boat{%endblock%}
+{%block head%}<a href="{{ url_for('views.search') }}"id="home-btn">Back</a>{%endblock%}
 {%block styles%}static/form-styles.css{%endblock%}
 {% block content%}
 <form method="POST">

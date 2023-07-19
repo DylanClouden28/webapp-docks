@@ -5,7 +5,7 @@ body {
     background-color: #222831;
     color: #eeeeee;
     height: 100%;
-    overflow: hidden; /* Add this to remove the scrollbar for the whole page */
+    overflow: hidden;
   }
 
   header {

@@ -41,7 +41,7 @@
         </thead>
         <tbody>
           {% for boat in boats %}
-          <tr>
+          <tr class="clickable-row" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number) }}">
             <td>{{ boat.boat_reg }}</td>
             <td>{{ boat.phone_number }}</td>
             <td>{{ boat.boat_name }}</td>
@@ -69,12 +69,11 @@
             <th>Boat Reg.</th>
             <th>Phone Number</th>
             <th>Boat Name</th>
-            <th>Visits</th>
           </tr>
         </thead>
         <tbody>
           {% for boat in currentboats %}
-          <tr class="clickable-row" data-href="{{ url_for('views.log_boat', boat_reg=form.boat_reg.data, boat_name=form.boat_name.data, phone_number=form.phone_number.data) }}">
+          <tr class="clickable-row" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number) }}">
             <td>{{ boat.boat_reg }}</td>
             <td>{{ boat.phone_number }}</td>
             <td>{{ boat.boat_name }}</td>
@@ -86,4 +85,15 @@
   </div>
 </div>
   <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+  <script>
+    window.onload = function() {
+      const rows = document.querySelectorAll('.clickable-row');
+      rows.forEach(row => {
+        row.addEventListener('click', () => {
+          window.location.href = row.getAttribute('data-href');
+        });
+      });
+    };
+  </script>
+  
 {%endblock%}

@@ -8,6 +8,7 @@ body {
   height: 100vh;
 }
 
+
 .container {
   width: 70%;
   margin: 0 auto;
@@ -127,6 +128,31 @@ h2 {
   right: 10px;
   color: #FFFFFF;
   cursor: pointer;
+}
+
+#home-btn {
+  font-size: 18px;
+  background-color: #00adb5;
+  color: #eeeeee;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  border-radius: 5px;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+
+
+#home-btn:hover {
+  background-color: #009e9a;
+  transform: scale(1.05);
+}
+
+#home-btn:active {
+  background-color: #00756e;
 }
 
 @keyframes fadein {
