@@ -41,7 +41,7 @@
         </thead>
         <tbody>
           {% for boat in boats %}
-          <tr class="clickable-row" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number) }}">
+          <tr class="clickable-row" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number, id=boat.id) }}">
             <td>{{ boat.boat_reg }}</td>
             <td>{{ boat.phone_number }}</td>
             <td>{{ boat.boat_name }}</td>
@@ -73,7 +73,7 @@
         </thead>
         <tbody>
           {% for boat in currentboats %}
-          <tr class="clickable-row" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number) }}">
+          <tr class="clickable-row" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number,  id=boat.id) }}">
             <td>{{ boat.boat_reg }}</td>
             <td>{{ boat.phone_number }}</td>
             <td>{{ boat.boat_name }}</td>

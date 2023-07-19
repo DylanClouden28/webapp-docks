@@ -93,6 +93,7 @@ h2 {
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
   border-radius: 5px;
+  margin-bottom: 20px;
 }
 
 .btn-primary:hover {
@@ -102,6 +103,18 @@ h2 {
 
 .btn-primary:active {
   background-color: #00756e;
+}
+
+#update-btn{
+  font-size: 15px;
+  background-color: #DF740C;
+  margin: auto;
+  color: #eeeeee;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  border-radius: 5px;
 }
 
 .alert {
