@@ -1,6 +1,6 @@
 from . import db
 from flask import Flask, flash, render_template, redirect, url_for
-from .models import Boat
+from .models import Boat, CurrentBoats
 from sqlalchemy import or_
 import re
 
@@ -45,6 +45,7 @@ def searchBoatInDB(current_page, form):
     sanitized_phone_number = sanitize(form.phone_number.data)
     conditions = []
     results = []
+    resultsToday = []
     if sanitized_boat_reg:
         conditions.append(Boat.sanitized_boat_reg.contains(sanitized_boat_reg))
     if sanitized_boat_name:
@@ -53,10 +54,15 @@ def searchBoatInDB(current_page, form):
         conditions.append(Boat.sanitized_phone_number.contains(sanitized_phone_number))
     if conditions:
         results = Boat.query.filter(or_(*conditions)).all()
+        resultsToday = CurrentBoats.query.first().boats.filter(or_(*conditions)).all()
     else:
-        flash('Please enter into search feild before submitting', category="error")
+        resultsToday = CurrentBoats.query.first().boats.all()
+        return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
+    
+    if not resultsToday or not results:
+        flash('No Boats Found in Database', category='error')
     print(results)
-    return render_template(current_page, form=form, boats=results)
+    return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
 
 def addBoatToDB(current_page, form):
     boat_reg = form.boat_reg.data
@@ -90,6 +96,14 @@ def addBoatToDB(current_page, form):
         return render_template(current_page, form=form)
     elif boat_reg or boat_name:
         new_boat = Boat(boat_reg=boat_reg, boat_name=boat_name, boat_size=boat_size, owner_name=owner_name, phone_number=phone_number, email=email, zipcode=zipcode, sanitized_boat_name=sanitized_boat_name, sanitized_boat_reg=sanitized_boat_reg, sanitized_owner_name=sanitized_owner_name, sanitized_phone_number=sanitized_phone_number)
+        
+        current_boats = CurrentBoats.query.first()
+        if not current_boats:
+            current_boats = CurrentBoats()
+            db.session.add(current_boats)
+
+        new_boat.current_boats_id = current_boats.id
+
         printBoat(new_boat)
         db.session.add(new_boat)
         db.session.commit()

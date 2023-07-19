@@ -3,7 +3,6 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;
   font-family: Arial, sans-serif;
   background-color: #222831;
   color: #eeeeee;
@@ -251,4 +250,27 @@ button:active {
   background-color: #00756e;
 }
 
+#main-container {
+  justify-content: space-between;
+  padding: 20px;
+}
 
+#right-container {
+  width: 50%;
+  margin-left: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: auto; 
+}
+
+#right-container #table-container {
+  overflow: auto;
+}
+
+
+#current-boats {
+  background-color: #393e46;
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0 auto;
+}

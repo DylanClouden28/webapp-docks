@@ -3,7 +3,7 @@ from flask_login import login_required
 from flask_wtf import FlaskForm
 from sqlalchemy import or_
 from . import db
-from .models import Boat
+from .models import Boat, CurrentBoats
 from .forms import BoatLogForm, SearchForm
 from .functions import addBoatToDB, searchBoatInDB
 import re
@@ -23,9 +23,11 @@ def search():
     if form.validate_on_submit():
         if request.method == "POST":
             return searchBoatInDB('search.html', form)
-    results = Boat.query.all()
+    results = []
+    resultsToday = CurrentBoats.query.first().boats.all()
     print(results)
-    return render_template('search.html', form=form, boats=results)
+    print(resultsToday)
+    return render_template('search.html', form=form, boats=results, currentboats=resultsToday)
 
 
 

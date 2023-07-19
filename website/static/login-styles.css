@@ -12,6 +12,12 @@ body {
   text-align: center;
 }
 
+#table-container {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
 header {
   padding: 20px;
 }
@@ -24,7 +30,13 @@ h1 {
 
 h2 {
   color: #eeeeee;
+  font-size: 100px;
   margin-bottom: 50px;
+  text-align: center;
+  width: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #login-container {

@@ -2,57 +2,88 @@
 {% block title %}Search Boats{% endblock %} 
 {%block head%}<a href="{{ url_for('views.home') }}"id="home-btn">Home</a>{%endblock%}
 {%block header%}{%endblock%}
-{%block styles%}static/styles.css{%endblock%}
+{%block styles%}static/search-styles.css{%endblock%}
 {% block content%}
-  <div id="search-container">
-    <form method="POST">
-      {{ form.hidden_tag() }}
-      <div class="form-group">
-        {{ form.boat_reg.label }}
-        {{ form.boat_reg(class="form-control") }}
-      </div>
-      <div class="form-group">
-        {{ form.boat_name.label }}
-        {{ form.boat_name(class="form-control") }}
-      </div>
-      <div class="form-group">
-        {{ form.phone_number.label }}
-        {{ form.phone_number(class="form-control") }}
-      </div>
-      <div id="button-container">
-        <button type="submit" class="btn btn-primary" id="login-btn">Search</button>
-      </div>
-    </form>
+<div id="main-container">
+  
+  <div id="left-container" style="flex: 1;">
+    <div id="search-container">
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          {{ form.boat_reg.label }}
+          {{ form.boat_reg(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.boat_name.label }}
+          {{ form.boat_name(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.phone_number.label }}
+          {{ form.phone_number(class="form-control") }}
+        </div>
+        <div id="button-container">
+          <button type="submit" class="btn btn-primary" id="login-btn">Search</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="table-container">
+      <h2>From Database</h2>
+      <table id="search-results">
+        <thead>
+          <tr>
+            <th>Boat Reg.</th>
+            <th>Phone Number</th>
+            <th>Boat Name</th>
+            <th>Visits</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for boat in boats %}
+          <tr>
+            <td>{{ boat.boat_reg }}</td>
+            <td>{{ boat.phone_number }}</td>
+            <td>{{ boat.boat_name }}</td>
+            <td>
+              <select>
+                {% for visit in boat.visits %}
+                <option>{{ visit }}</option>
+                {% endfor %}
+              </select>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <div id="table-container">
-    <table id="search-results">
-      <thead>
-        <tr>
-          <th>Boat Reg.</th>
-          <th>Phone Number</th>
-          <th>Boat Name</th>
-          <th>Visits</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for boat in boats %}
-        <tr>
-          <td>{{ boat.boat_reg }}</td>
-          <td>{{ boat.phone_number }}</td>
-          <td>{{ boat.boat_name }}</td>
-          <td>
-            <select>
-              {% for visit in boat.visits %}
-              <option>{{ visit }}</option>
-              {% endfor %}
-            </select>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
 
+  <div id="right-container" style="flex: 1;">
+    <div id="table-container">
+      <h2>Today</h2>
+      <table id="current-boats">
+        <thead>
+          <tr>
+            <th>Boat Reg.</th>
+            <th>Phone Number</th>
+            <th>Boat Name</th>
+            <th>Visits</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for boat in currentboats %}
+          <tr class="clickable-row" data-href="{{ url_for('views.log_boat', boat_reg=form.boat_reg.data, boat_name=form.boat_name.data, phone_number=form.phone_number.data) }}">
+            <td>{{ boat.boat_reg }}</td>
+            <td>{{ boat.phone_number }}</td>
+            <td>{{ boat.boat_name }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
   <script src="{{ url_for('static', filename='js/search.js') }}"></script>
 {%endblock%}

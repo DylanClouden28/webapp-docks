@@ -6,6 +6,10 @@ import re
 def sanitize(input_string):
     return re.sub(r'\W+', '', input_string).lower()
 
+class CurrentBoats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    boats = db.relationship('Boat', lazy='dynamic')
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True)
@@ -34,7 +38,7 @@ class Boat(db.Model):
     email = db.Column(db.String(150))
     zipcode = db.Column(db.String(150))
     visits = db.relationship('Visit')
-    
+    current_boats_id = db.Column(db.Integer, db.ForeignKey('current_boats.id'))
 
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,10 +54,6 @@ class Visit(db.Model):
     unpaid_nights = db.Column(db.Integer)
     boat_id = db.Column(db.Integer, db.ForeignKey('boat.id'))
 
-class CurrentBoats(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    CurrentBoats = db.relationship('Boat')
-
 class DebtBoats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    DebtBoats = db.relationship('Boat')
+
