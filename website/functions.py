@@ -39,6 +39,37 @@ def sanitize(string):
 def no_whitespace_lowercase(string):
     return ''.join(string.split()).lower()
 
+def getBoatById(id):
+    boat = Boat.query.get(id)
+    if boat is None:
+        flash('No boat with given ID found', 'error')
+        return None
+    else:
+        return boat
+
+def updateBoatInfo(form, boat):
+    if form.boat_reg.data:
+        boat.boat_reg = form.boat_reg.data
+        boat.sanitized_boat_reg = sanitize(form.boat_reg.data)
+    if form.boat_name.data:
+        boat.boat_name = form.boat_name.data
+        boat.sanitized_boat_name = sanitize(form.boat_name.data)
+    if form.phone_number.data:
+        boat.phone_number = form.phone_number.data
+        boat.sanitized_phone_number = sanitize(form.phone_number.data)
+
+    if form.owner_name.data:
+        boat.owner_name = form.owner_name.data
+        boat.sanitized_owner_name = sanitize(form.owner_name.data)
+
+    if form.boat_size.data:
+        boat.boat_size = form.boat_size.data
+
+    if form.phone_number.data:
+        boat.email = form.email.data
+    if form.zipcode.data:
+        boat.zipcode = form.zipcode.data 
+    db.session.commit()
 def searchBoatInDB(current_page, form):
     sanitized_boat_reg = sanitize(form.boat_reg.data)
     sanitized_boat_name = sanitize(form.boat_name.data)
@@ -64,7 +95,7 @@ def searchBoatInDB(current_page, form):
     print(results)
     return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
 
-def searchDBforexistingdata(form):
+def getBoatInDB(form):
     sanitized_boat_reg = sanitize(form.boat_reg.data)
     sanitized_boat_name = sanitize(form.boat_name.data)
     sanitized_phone_number = sanitize(form.phone_number.data)
