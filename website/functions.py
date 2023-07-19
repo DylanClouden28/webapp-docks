@@ -64,6 +64,29 @@ def searchBoatInDB(current_page, form):
     print(results)
     return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
 
+def searchDBforexistingdata(form):
+    sanitized_boat_reg = sanitize(form.boat_reg.data)
+    sanitized_boat_name = sanitize(form.boat_name.data)
+    sanitized_phone_number = sanitize(form.phone_number.data)
+    conditions = []
+    results = []
+    resultsToday = []
+    if sanitized_boat_reg:
+        conditions.append(Boat.sanitized_boat_reg.contains(sanitized_boat_reg))
+    if sanitized_boat_name:
+        conditions.append(Boat.sanitized_boat_name.contains(sanitized_boat_name))
+    if sanitized_phone_number:
+        conditions.append(Boat.sanitized_phone_number.contains(sanitized_phone_number))
+    if conditions:
+        results = Boat.query.filter(*conditions).all()
+    if len(results) > 1:
+        flash('Error more than version of this boat found in Database', category='error')
+        return []
+    elif len(results) == 1:
+        return results[0]
+    else:
+        return []
+
 def addBoatToDB(current_page, form):
     boat_reg = form.boat_reg.data
     boat_name = form.boat_name.data
@@ -79,8 +102,10 @@ def addBoatToDB(current_page, form):
     sanitized_boat_name = sanitize(form.boat_name.data)
     sanitized_phone_number = sanitize(form.phone_number.data)
     sanitized_owner_name = sanitize(form.owner_name.data)
+    print(sanitized_boat_name)
+    print(sanitized_boat_reg)
 
-    if not boat_reg and not boat_name:
+    if not sanitized_boat_reg and not sanitized_boat_name:
         flash('Boat Registration or Boat Name is required.', category="error")
         return render_template(current_page, form=form)
     elif not sanitized_phone_number and phone_number:
