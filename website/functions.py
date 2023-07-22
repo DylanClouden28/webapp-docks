@@ -94,7 +94,7 @@ def searchBoatInDB(current_page, form):
         return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
     
     if not resultsToday or not results:
-        flash('No Boats Found in Database', category='error')
+        flash('No Boats Found in Database', category='error')  
     print(results)
     return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
 
