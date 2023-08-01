@@ -1,6 +1,8 @@
 from . import db
+from datetime import datetime, timezone
 from flask import Flask, flash, render_template, redirect, url_for
-from .models import Boat, CurrentBoats
+from flask_login import current_user
+from .models import Boat, CurrentBoats, Visit
 from sqlalchemy import or_
 import re
 
@@ -70,6 +72,7 @@ def updateBoatInfo(form, boat):
     if form.zipcode.data:
         boat.zipcode = form.zipcode.data 
     db.session.commit()
+
 def searchBoatInDB(current_page, form):
     sanitized_boat_reg = sanitize(form.boat_reg.data)
     sanitized_boat_name = sanitize(form.boat_name.data)
@@ -95,6 +98,29 @@ def searchBoatInDB(current_page, form):
     print(results)
     return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
 
+def BoatInCurrentBoats(form):
+    sanitized_boat_reg = sanitize(form.boat_reg.data)
+    sanitized_boat_name = sanitize(form.boat_name.data)
+    sanitized_phone_number = sanitize(form.phone_number.data)
+    conditions = []
+    results = []
+    resultsToday = []
+    if sanitized_boat_reg:
+        conditions.append(Boat.sanitized_boat_reg.contains(sanitized_boat_reg))
+    if sanitized_boat_name:
+        conditions.append(Boat.sanitized_boat_name.contains(sanitized_boat_name))
+    if sanitized_phone_number:
+        conditions.append(Boat.sanitized_phone_number.contains(sanitized_phone_number))
+    if conditions:
+        resultsToday = CurrentBoats.query.first().boats.filter(or_(*conditions)).all()
+    if len(resultsToday) > 1:
+        flash('Error more than version of this boat found in Database', category='error')
+        return []
+    elif len(resultsToday) == 1:
+        return resultsToday[0]
+    else:
+        return []
+    
 def getBoatInDB(form):
     sanitized_boat_reg = sanitize(form.boat_reg.data)
     sanitized_boat_name = sanitize(form.boat_name.data)
@@ -147,6 +173,7 @@ def addBoatToDB(current_page, form):
         boat = Boat.query.filter_by(sanitized_boat_reg=sanitized_boat_reg).first()
     elif boat_name:
         boat = Boat.query.filter_by(sanitized_boat_name=sanitized_boat_name).first()
+
     if boat:
         flash('Boat already exists', category="error")
         return render_template(current_page, form=form)
@@ -158,9 +185,17 @@ def addBoatToDB(current_page, form):
             current_boats = CurrentBoats()
             db.session.add(current_boats)
 
-        new_boat.current_boats_id = current_boats.id
-
+        if not BoatInCurrentBoats(form):
+            new_boat.current_boats_id = current_boats.id
+            new_visit = Visit(
+                logged_by = current_user,
+                date_in = datetime.now(timezone.utc),
+                boat=new_boat 
+            )
+            print("New Visit: ", new_visit.logged_by, new_visit.date_in, new_visit.boat_id)
         printBoat(new_boat)
+        print(current_boats.boats)
+        db.session.add(new_visit)
         db.session.add(new_boat)
         db.session.commit()
         flash("Boat Logged!", category="success")
