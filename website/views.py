@@ -27,7 +27,7 @@ def search():
             if button_pressed == 'search':
                 return searchBoatInDB('search.html', form)
             if button_pressed == 'add':
-                return redirect(url_for('views.log_boat', boat_reg=form.boat_reg, boat_name=form.boat_name, phone_number=form.phone_number))
+                return redirect(url_for('views.log_boat', boat_reg=form.boat_reg.data, boat_name=form.boat_name.data, phone_number=form.phone_number.data))
     results = []
     resultsToday = []
     if CurrentBoats.query.first():

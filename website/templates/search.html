@@ -8,7 +8,7 @@
   
   <div id="left-container" style="flex: 1;">
     <div id="search-container">
-      <form method="POST">
+      <form method="POST" id="search">
         {{ form.hidden_tag() }}
         <div class="form-group">
           {{ form.boat_reg.label }}
@@ -84,11 +84,7 @@
       </table>
       {% else %}
       <div id="button-container">
-        <form method="POST">
-          <div id="button-container">
-            <button type="submit" class="btn btn-primary" id="login-btn" name="submit-button" value="add">Add New Boat</button>
-          </div>
-        </form>
+            <button type="submit" form="search" class="btn btn-primary" id="login-btn" name="submit-button" value="add">Add New Boat</button>
       </div>
       {%endif%}
     </div>
