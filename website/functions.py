@@ -192,18 +192,22 @@ def addBoatToDB(current_page, form):
         #Adds boat to CurrentBoats with new Visit
         new_visit = None
         if not BoatInCurrentBoats(form):
+            print("Creating New Visit")
             new_boat.current_boats_id = current_boats.id
             new_visit = Visit(
                 logged_by = current_user.id,
                 date_in = datetime.now(timezone.utc),
-                boat_id=new_boat.id 
             )
+            print(new_visit)
         printBoat(new_boat)
         print(current_boats.boats)
-        if new_visit:
-            db.session.add(new_visit)
         if not boat:
             db.session.add(new_boat)
+            db.session.commit()
+            new_boat = Boat.query.filter_by(boat_reg=boat_reg, boat_name=boat_name).first()
+        if new_visit:
+            new_visit.boat_id = new_boat.id
+            db.session.add(new_visit)
         db.session.commit()
 
         if new_visit:

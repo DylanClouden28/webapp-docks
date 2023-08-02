@@ -81,4 +81,5 @@ def visits():
         boat = getBoatById(request.args.get('id', ''))
         if not boat:
             flash("Bad Boat ID", category='error')
+        print("Visits: ", boat.visits)
         return render_template("visits.html", boat=boat)

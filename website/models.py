@@ -37,7 +37,7 @@ class Boat(db.Model):
 
     email = db.Column(db.String(150))
     zipcode = db.Column(db.String(150))
-    visits = db.relationship('Visit')
+    visits = db.relationship('Visit', backref='boat')
     current_boats_id = db.Column(db.Integer, db.ForeignKey('current_boats.id'))
 
 class Visit(db.Model):
