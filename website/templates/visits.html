@@ -6,7 +6,7 @@
 {% block content%}
 <div id="main-container">
     <div id="table-container">
-        <h2>From Database</h2>
+        <h2>Visits</h2>
         <table id="search-results">
           <thead>
             <tr>
@@ -19,12 +19,13 @@
               <th>Paid Amount</th>
               <th>Unpaid Days</th>
               <th>Unpaid Nights</th>
+              <th>Total</th>
               <th>Logged By</th>
             </tr>
           </thead>
           <tbody>
             {% for visit in boat.visits %}
-              <td>{{ visit.date_in }}</td>
+              <td>{{ visit.date_in | utc_to_est}}</td>
               <td>{{ visit.date_paid }}</td>
               <td>{{ visit.paid_days }}</td>
               <td>{{ visit.paid_nights }}</td>
@@ -33,7 +34,8 @@
               <td>{{ visit.paid_amount }}</td>
               <td>{{ visit.unpaid_days  }}</td>
               <td>{{ visit.unpaid_nights }}</td>
-              <td>{{ visit.logged_by }}</td>
+              <td>{{ visit.total }}</td>
+              <td>{{ visit.logged_by | userID_to_name }}</td>
             {% endfor %}
           </tbody>
         </table>

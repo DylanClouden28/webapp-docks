@@ -4,8 +4,8 @@ from flask_wtf import FlaskForm
 from sqlalchemy import or_
 from . import db
 from .models import Boat, CurrentBoats
-from .forms import BoatLogForm, SearchForm
-from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById
+from .forms import BoatLogForm, SearchForm, PaymentForm
+from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment
 import re
 
 views = Blueprint('views', __name__)
@@ -77,9 +77,13 @@ def log_boat():
 @views.route('/visits')
 @login_required
 def visits():
-    if request.method == "GET":
-        boat = getBoatById(request.args.get('id', ''))
-        if not boat:
-            flash("Bad Boat ID", category='error')
-        print("Visits: ", boat.visits)
-        return render_template("visits.html", boat=boat)
+    form = PaymentForm()
+    boat = getBoatById(request.args.get('id', ''))
+    if form.validate_on_submit():
+        if request.method == "POST":
+            add_payment("visits.html", form, boat)
+
+    if not boat:
+        flash("Bad Boat ID", category='error')
+    print("Visits: ", boat.visits)
+    return render_template("visits.html", boat=boat)

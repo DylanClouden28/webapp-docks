@@ -52,6 +52,7 @@ class Visit(db.Model):
     paid_with = db.Column(db.String(150))
     unpaid_days = db.Column(db.Integer)
     unpaid_nights = db.Column(db.Integer)
+    total = db.Column(db.Float)
     boat_id = db.Column(db.Integer, db.ForeignKey('boat.id'))
 
 class DebtBoats(db.Model):

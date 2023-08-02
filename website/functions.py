@@ -217,3 +217,55 @@ def addBoatToDB(current_page, form):
         if not new_visit and boat:
             flash("Boat Already Logged!", category="error")
         return redirect(url_for('views.search'))
+
+def calcPrice(boat, days, nights, enw):
+    size = boat.boat_size
+    daysTotal = 0
+    nightsTotal = 0
+    enwTotal = 0
+    if enw:
+        enwTotal = 5
+    if size == "0-25":
+        if days > 0:
+            daysTotal = 15 * days
+        if nights > 0:
+            nightsTotal = (25 + enwTotal) * nights
+    elif size == "26-40":
+        if days > 0:
+            daysTotal = 20 * days
+        if nights > 0:
+            nightsTotal = (30 + enwTotal) * nights
+    elif size == "41-Over":
+        if days > 0:
+            daysTotal = 25 * days
+        if nights > 0:
+            nightsTotal = (35 + enwTotal) * nights
+
+    return daysTotal, nightsTotal
+
+def add_payment(current_page, form, boat):
+    sanitize_paid_days = sanitize(form.paid_days.data)
+    sanitize_paid_nights = sanitize(form.paid_nights.data)
+    paid_enw = form.paid_enw.data
+    paid_with = form.paid_with.data
+    current_visit = None
+
+    if boat.current_boats_id:
+        current_visit = boat.visits[-1]
+
+    current_visit.paid_days = sanitize_paid_days
+    current_visit.paid_nights = sanitize_paid_nights
+    if paid_enw == "Yes":
+        current_visit.paid_enw = True
+    else:
+        current_visit.paid_enw = False
+    current_visit.paid_with = paid_with
+    current_visit.paid_amount = calcPrice(boat, sanitize_paid_days, sanitize_paid_nights, current_visit.paid_enw)
+    lastTotal = 0
+    if len(boat.visits) > 1:
+        lastTotal = boat.visits[-2].total
+    current_visit.total = lastTotal + current_visit.paid_amount
+    current_visit.date_paid = datetime.now(timezone.utc)
+    
+
+        

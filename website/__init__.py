@@ -4,6 +4,8 @@ from os import path
 from flask_login import LoginManager
 from website.config import SECRET_KEY
 from flask_wtf.csrf import CSRFProtect
+from datetime import datetime
+import pytz
 
 db = SQLAlchemy()
 DB_NAME = 'database.db'
@@ -31,6 +33,22 @@ def create_app():
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
+
+    @app.template_filter('utc_to_est')
+    def utc_to_est_filter(s):
+        fmt = "%Y-%m-%d %H:%M:%S.%f+00:00"
+        utc_datetime = datetime.strptime(s, fmt)
+
+        est_tz = pytz.timezone('US/Eastern')
+        est_datetime = utc_datetime.replace(tzinfo=pytz.utc).astimezone(est_tz)
+
+        return est_datetime.strftime('%Y-%m-%d %I:%M %p')
+    
+    @app.template_filter('userID_to_name')
+    def userID_to_name(s):
+        user = load_user(int(s))
+        return user.first_name
+
 
     return app
 

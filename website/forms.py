@@ -22,6 +22,13 @@ class BoatLogForm(FlaskForm):
     zipcode = StringField('Zipcode or Postal Code')
     submit = SubmitField('Submit')
 
+class PaymentForm(FlaskForm):
+    paid_days = StringField('Paid Days', validators=[DataRequired()])
+    paid_nights = StringField('Paid Nights', validators=[DataRequired()])
+    paid_enw = RadioField('Electric / Water', choices=[('Yes','Yes'), ('No', 'No') ] , validators=[DataRequired()])
+    paid_with  = RadioField('Payment Method', choices=[('Cash','Cash'), ('Check', 'Check'), ('Charge', 'Charge') ] , validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
 class SearchForm(FlaskForm):
     boat_reg = StringField('Search Boat Registration')
     boat_name = StringField('Search Boat Name')
