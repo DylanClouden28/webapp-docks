@@ -115,7 +115,8 @@ def BoatInCurrentBoats(form):
         resultsToday = CurrentBoats.query.first().boats.filter(or_(*conditions)).all()
     if len(resultsToday) > 1:
         flash('Error more than version of this boat found in Database', category='error')
-        return []
+        print("ERROR MORE THAN 1 BOAT FOUND, RESULTS: ", resultsToday)
+        return -1
     elif len(resultsToday) == 1:
         return resultsToday[0]
     else:
@@ -138,7 +139,7 @@ def getBoatInDB(form):
         results = Boat.query.filter(*conditions).all()
     if len(results) > 1:
         flash('Error more than version of this boat found in Database', category='error')
-        return []
+        return -1
     elif len(results) == 1:
         return results[0]
     else:
@@ -174,29 +175,41 @@ def addBoatToDB(current_page, form):
     elif boat_name:
         boat = Boat.query.filter_by(sanitized_boat_name=sanitized_boat_name).first()
 
-    if boat:
-        flash('Boat already exists', category="error")
-        return render_template(current_page, form=form)
-    elif boat_reg or boat_name:
-        new_boat = Boat(boat_reg=boat_reg, boat_name=boat_name, boat_size=boat_size, owner_name=owner_name, phone_number=phone_number, email=email, zipcode=zipcode, sanitized_boat_name=sanitized_boat_name, sanitized_boat_reg=sanitized_boat_reg, sanitized_owner_name=sanitized_owner_name, sanitized_phone_number=sanitized_phone_number)
-        
+    
+    if boat_reg or boat_name:
+        #Not in Database
+        if not boat:
+            new_boat = Boat(boat_reg=boat_reg, boat_name=boat_name, boat_size=boat_size, owner_name=owner_name, phone_number=phone_number, email=email, zipcode=zipcode, sanitized_boat_name=sanitized_boat_name, sanitized_boat_reg=sanitized_boat_reg, sanitized_owner_name=sanitized_owner_name, sanitized_phone_number=sanitized_phone_number)
+        #In database
+        else:
+            new_boat = boat
+
         current_boats = CurrentBoats.query.first()
         if not current_boats:
             current_boats = CurrentBoats()
             db.session.add(current_boats)
 
+        #Adds boat to CurrentBoats with new Visit
+        new_visit = None
         if not BoatInCurrentBoats(form):
             new_boat.current_boats_id = current_boats.id
             new_visit = Visit(
-                logged_by = current_user,
+                logged_by = current_user.id,
                 date_in = datetime.now(timezone.utc),
-                boat=new_boat 
+                boat_id=new_boat.id 
             )
-            print("New Visit: ", new_visit.logged_by, new_visit.date_in, new_visit.boat_id)
         printBoat(new_boat)
         print(current_boats.boats)
-        db.session.add(new_visit)
-        db.session.add(new_boat)
+        if new_visit:
+            db.session.add(new_visit)
+        if not boat:
+            db.session.add(new_boat)
         db.session.commit()
-        flash("Boat Logged!", category="success")
-        return redirect(url_for('views.home'))
+
+        if new_visit:
+            flash("New Visit Logged!", category="success")
+        if not boat:
+            flash("New Boat Added To DB!", category="success")
+        if not new_visit and boat:
+            flash("Boat Already Logged!", category="error")
+        return redirect(url_for('views.search'))

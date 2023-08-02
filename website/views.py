@@ -22,11 +22,17 @@ def search():
     form = SearchForm()
     if form.validate_on_submit():
         if request.method == "POST":
-            return searchBoatInDB('search.html', form)
+            button_pressed = request.form.get('submit-button')
+            print("Button pressed is: " + str(button_pressed))
+            if button_pressed == 'search':
+                return searchBoatInDB('search.html', form)
+            if button_pressed == 'add':
+                return redirect(url_for('views.log_boat', boat_reg=form.boat_reg, boat_name=form.boat_name, phone_number=form.phone_number))
     results = []
-    resultsToday = CurrentBoats.query.first().boats.all()
-    print(results)
-    print(resultsToday)
+    resultsToday = []
+    if CurrentBoats.query.first():
+        resultsToday = CurrentBoats.query.first().boats.all()
+        print(resultsToday)
     return render_template('search.html', form=form, boats=results, currentboats=resultsToday)
 
 
@@ -47,6 +53,9 @@ def log_boat():
                 updateBoatInfo(form, result)
                 flash('Succesfully updated boater information', category='success')
                 return redirect(url_for('views.search'))
+            elif button_pressed == 'visits':
+                currentboatID = request.args.get('id', '')
+                return redirect(url_for('views.visits', id=currentboatID))
     else:
         print(form.errors)
     if request.method == "GET":
@@ -64,3 +73,12 @@ def log_boat():
            form.email.data = result.email
            form.zipcode.data = result.zipcode
     return render_template("log-boat.html", form=form)
+
+@views.route('/visits')
+@login_required
+def visits():
+    if request.method == "GET":
+        boat = getBoatById(request.args.get('id', ''))
+        if not boat:
+            flash("Bad Boat ID", category='error')
+        return render_template("visits.html", boat=boat)

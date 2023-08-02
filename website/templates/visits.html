@@ -1,0 +1,42 @@
+{% extends "base.html" %} 
+{% block title %}Boats Visits{% endblock %} 
+{%block head%}<a href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number, id=boat.id) }}"id="home-btn">Back</a>{%endblock%}
+{%block header%}{%endblock%}
+{%block styles%}static/search-styles.css{%endblock%}
+{% block content%}
+<div id="main-container">
+    <div id="table-container">
+        <h2>From Database</h2>
+        <table id="search-results">
+          <thead>
+            <tr>
+              <th>Date in</th>
+              <th>Date Paid</th>
+              <th>Paid Days</th>
+              <th>Paid Nights</th>
+              <th>Electric / Water</th>
+              <th>Payment Method</th>
+              <th>Paid Amount</th>
+              <th>Unpaid Days</th>
+              <th>Unpaid Nights</th>
+              <th>Logged By</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for visit in boat.visits %}
+              <td>{{ visit.date_in }}</td>
+              <td>{{ visit.date_paid }}</td>
+              <td>{{ visit.paid_days }}</td>
+              <td>{{ visit.paid_nights }}</td>
+              <td>{{ visit.paid_enw }}</td>
+              <td>{{ visit.paid_with }}</td>
+              <td>{{ visit.unpaid_days  }}</td>
+              <td>{{ visit.unpaid_nights }}</td>
+              <td>{{ visit.logged_by }}</td>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+</div>
+{%endblock%}
