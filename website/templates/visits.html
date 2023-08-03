@@ -1,7 +1,11 @@
 {% extends "base.html" %} 
 {% block title %}Boats Visits{% endblock %} 
 {%block head%}<a href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number, id=boat.id) }}"id="home-btn">Back</a>{%endblock%}
-{%block header%}<link rel="stylesheet" href="static/form-styles.css">{%endblock%}
+{%block header%}<link rel="stylesheet" href="static/form-styles.css"><style>.container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}</style>{%endblock%}
 {%block styles%}static/visit-styles.css{%endblock%}
 {% block content%}
 <div id="main-container">
@@ -22,21 +26,45 @@
                     <th>Unpaid Nights</th>
                     <th>Total</th>
                     <th>Logged By</th>
+                    <th>Edit</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for visit in boat.visits %}
-                    <td>{{ visit.date_in | utc_to_est}}</td>
-                    <td>{{ visit.date_paid | utc_to_est}}</td>
-                    <td>{{ visit.paid_days }}</td>
-                    <td>{{ visit.paid_nights }}</td>
-                    <td>{{ visit.paid_enw }}</td>
-                    <td>{{ visit.paid_with }}</td>
-                    <td>{{ visit.paid_amount }}</td>
-                    <td>{{ visit.unpaid_days  }}</td>
-                    <td>{{ visit.unpaid_nights }}</td>
-                    <td>{{ visit.total }}</td>
-                    <td>{{ visit.logged_by | userID_to_name }}</td>
+                    <tr id="row-{{ visit.id }}">
+                      <td class="editable">{{ visit.date_in | utc_to_est}}</td>
+                      <td class="editable">{{ visit.date_paid | utc_to_est}}</td>
+                      <td class="editable">{{ visit.paid_days }}</td>
+                      <td class="editable">{{ visit.paid_nights }}</td>
+                      <td class="editable">{{ visit.paid_enw }}</td>
+                      <td class="editable">{{ visit.paid_with }}</td>
+                      <td>{{ visit.paid_amount }}</td>
+                      <td>{{ visit.unpaid_days  }}</td>
+                      <td>{{ visit.unpaid_nights }}</td>
+                      <td>{{ visit.total }}</td>
+                      <td>{{ visit.logged_by | userID_to_name }}</td>
+                      <td>
+                        <button class="edit-button">
+                            <img src="static/edit.svg" alt="Edit" width="20" height="20">
+                        </button>
+                        <form class="edit-form" style="display: none;" method="POST" action="{{ url_for('views.update_payment', visitid=visit.id) }}">
+                          {{ form.hidden_tag() }}
+                            <input type="text" name="paid_days" value="{{ visit.paid_days }}">
+                            <input type="text" name="paid_nights" value="{{ visit.paid_nights }}">
+                            <input type="radio" name="paid_enw" value="Yes" {% if visit.paid_enw == True %}checked{% endif %}> Yes
+                            <input type="radio" name="paid_enw" value="No" {% if visit.paid_enw == False %}checked{% endif %}> No
+                            <input type="radio" name="paid_with" value="Cash" {% if visit.paid_with == 'Cash' %}checked{% endif %}> Cash
+                            <input type="radio" name="paid_with" value="Check" {% if visit.paid_with == 'Check' %}checked{% endif %}> Check
+                            <input type="radio" name="paid_with" value="Charge" {% if visit.paid_with == 'Charge' %}checked{% endif %}> Charge
+                            <button type="submit" class="save-button">
+                                <img src="static/checkmark.svg" alt="Save" width="20" height="20">
+                            </button>
+                        </form>
+                        <button class="cancel-button" style="display: none;">
+                            <img src="static/cancel.svg" alt="Cancel" width="20" height="20">
+                        </button>
+                    </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
                 </table>
@@ -58,11 +86,13 @@
               {{ form.paid_nights(class="form-control") }}
             </div>
             <div>
+              <h3 class="form-check-input">Using Water or Electric</h3>
                 {% for subfield in form.paid_enw %}
                     {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
                 {% endfor %}
-            </div>
+            </div>  
             <div>
+              <h3 class="form-check-input">Payment Method</h3> 
                 {% for subfield in form.paid_with %}
                     {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
                 {% endfor %}
@@ -73,4 +103,32 @@
           </form>
         </div>
 </div>
+<script>
+  // Get all edit buttons
+var editButtons = document.getElementsByClassName("edit-button");
+// Add click event listener to all edit buttons
+for (var i = 0; i < editButtons.length; i++) {
+    editButtons[i].addEventListener("click", function() {
+        var row = this.parentElement.parentElement;
+        var form = row.getElementsByClassName("edit-form")[0];
+        form.style.display = 'block';
+        // Hide the edit button and show the cancel button
+        this.style.display = 'none';
+        row.getElementsByClassName("cancel-button")[0].style.display = 'block';
+    });
+}
+
+// Add click event listener to all cancel buttons
+var cancelButtons = document.getElementsByClassName("cancel-button");
+for (var i = 0; i < cancelButtons.length; i++) {
+    cancelButtons[i].addEventListener("click", function() {
+        var row = this.parentElement.parentElement;
+        var form = row.getElementsByClassName("edit-form")[0];
+        form.style.display = 'none';
+        // Hide the cancel button and show the edit button
+        this.style.display = 'none';
+        row.getElementsByClassName("edit-button")[0].style.display = 'block';
+    });
+}
+</script>
 {%endblock%}

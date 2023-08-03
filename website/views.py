@@ -3,9 +3,9 @@ from flask_login import login_required
 from flask_wtf import FlaskForm
 from sqlalchemy import or_
 from . import db
-from .models import Boat, CurrentBoats
+from .models import Boat, CurrentBoats, Visit
 from .forms import BoatLogForm, SearchForm, PaymentForm
-from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment
+from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment
 import re
 
 views = Blueprint('views', __name__)
@@ -81,9 +81,24 @@ def visits():
     boat = getBoatById(request.args.get('id', ''))
     if form.validate_on_submit():
         if request.method == "POST":
-            add_payment("visits.html", form, boat)
+            button_pressed = request.form.get('submit-button')
+            print("Button pressed is: " + str(button_pressed))
+            if button_pressed == "search":
+                add_payment("visits.html", form, boat)
+            if button_pressed == "edit":
+                update_payment()
 
     if not boat:
         flash("Bad Boat ID", category='error')
     print("Visits: ", boat.visits)
     return render_template("visits.html", form=form, boat=boat)
+
+@views.route('/update_payment/<int:visitid>', methods=['POST'])
+def update_payment(visitid):
+    form = PaymentForm(request.form)
+    if form.validate():
+        edit_payment(visitid, form)
+        return redirect(url_for('views.visits', id=visitid))
+    else:
+        flash("Invalid form reload or relogin", category="error")
+        return render_template('edit.html', form=form)
