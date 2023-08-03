@@ -269,5 +269,4 @@ def add_payment(current_page, form, boat):
     current_visit.date_paid = datetime.now(timezone.utc)
     db.session.commit()
 
-
         
