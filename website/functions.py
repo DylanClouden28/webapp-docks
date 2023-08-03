@@ -260,12 +260,14 @@ def add_payment(current_page, form, boat):
     else:
         current_visit.paid_enw = False
     current_visit.paid_with = paid_with
-    current_visit.paid_amount = calcPrice(boat, sanitize_paid_days, sanitize_paid_nights, current_visit.paid_enw)
+    daysTotal, nightsTotal = calcPrice(boat, int(sanitize_paid_days), int(sanitize_paid_nights), current_visit.paid_enw)
+    current_visit.paid_amount = daysTotal + nightsTotal
     lastTotal = 0
     if len(boat.visits) > 1:
         lastTotal = boat.visits[-2].total
     current_visit.total = lastTotal + current_visit.paid_amount
     current_visit.date_paid = datetime.now(timezone.utc)
-    
+    db.session.commit()
+
 
         

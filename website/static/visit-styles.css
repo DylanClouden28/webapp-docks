@@ -1,0 +1,159 @@
+body {
+    margin: 0;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    background-color: #222831;
+    color: #eeeeee;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    justify-content: flex-start;
+    padding: 10px;
+  }
+  
+  #content-container {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .alert {
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+    border-radius: 3px;
+    color: #FFFFFF;
+    animation: fadein 2s;
+    position: relative;
+    width: 98%;
+  }
+  
+  .alert-success {
+    background-color: #4CAF50;
+  }
+  
+  .alert-error {
+    background-color: #f44336;
+  }
+
+  h2 {
+    font-size: 35px;
+    color: #eeeeee;
+    width: 100%;
+    text-align: center;
+  }
+  
+  
+  
+  .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    color: #FFFFFF;
+    cursor: pointer;
+  }
+  
+  #main-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  #left-container,
+  #right-container {
+    flex: 1;
+    max-height: 100%;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  #search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  input[type="text"] {
+    margin: 5px;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  table {
+    background-color: #393e46;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #00adb5;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #4e535a;
+  }
+  
+  #button-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  #login-btn {
+    font-size: 24px;
+    text-align: center;
+    background-color: #00adb5;
+    color: #eeeeee;
+    padding: 20px 40px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-radius: 5px;
+  }
+  
+  #login-btn:hover {
+    background-color: #009e9a;
+    transform: scale(1.05);
+  }
+  
+  #login-btn:active {
+    background-color: #00756e;
+  }
+  
+  .clickable-row {
+    cursor: pointer;
+  }
+  
+  #home-btn {
+    font-size: 18px;
+    background-color: #00adb5;
+    color: #eeeeee;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-radius: 5px;
+    display: inline-block;
+    margin-right: 5px;
+  }
+  
+  #home-btn:hover {
+    background-color: #009e9a;
+    transform: scale(1.05);
+  }
+  
+  #home-btn:active {
+    background-color: #00756e;
+  }
+  
+  

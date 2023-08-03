@@ -74,7 +74,7 @@ def log_boat():
            form.zipcode.data = result.zipcode
     return render_template("log-boat.html", form=form)
 
-@views.route('/visits')
+@views.route('/visits' , methods=['GET','POST'])
 @login_required
 def visits():
     form = PaymentForm()
@@ -86,4 +86,4 @@ def visits():
     if not boat:
         flash("Bad Boat ID", category='error')
     print("Visits: ", boat.visits)
-    return render_template("visits.html", boat=boat)
+    return render_template("visits.html", form=form, boat=boat)

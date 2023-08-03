@@ -1,45 +1,76 @@
 {% extends "base.html" %} 
 {% block title %}Boats Visits{% endblock %} 
 {%block head%}<a href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number, id=boat.id) }}"id="home-btn">Back</a>{%endblock%}
-{%block header%}{%endblock%}
-{%block styles%}static/search-styles.css{%endblock%}
+{%block header%}<link rel="stylesheet" href="static/form-styles.css">{%endblock%}
+{%block styles%}static/visit-styles.css{%endblock%}
 {% block content%}
 <div id="main-container">
-    <div id="table-container">
-        <h2>Visits</h2>
-        <table id="search-results">
-          <thead>
-            <tr>
-              <th>Date in</th>
-              <th>Date Paid</th>
-              <th>Paid Days</th>
-              <th>Paid Nights</th>
-              <th>Electric / Water</th>
-              <th>Payment Method</th>
-              <th>Paid Amount</th>
-              <th>Unpaid Days</th>
-              <th>Unpaid Nights</th>
-              <th>Total</th>
-              <th>Logged By</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for visit in boat.visits %}
-              <td>{{ visit.date_in | utc_to_est}}</td>
-              <td>{{ visit.date_paid }}</td>
-              <td>{{ visit.paid_days }}</td>
-              <td>{{ visit.paid_nights }}</td>
-              <td>{{ visit.paid_enw }}</td>
-              <td>{{ visit.paid_with }}</td>
-              <td>{{ visit.paid_amount }}</td>
-              <td>{{ visit.unpaid_days  }}</td>
-              <td>{{ visit.unpaid_nights }}</td>
-              <td>{{ visit.total }}</td>
-              <td>{{ visit.logged_by | userID_to_name }}</td>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+    <div id="left-container" style="flex: 1;">
+            <div id="table-container">
+                <h2>Visits</h2>
+                <table id="search-results">
+                <thead>
+                    <tr>
+                    <th>Date in</th>
+                    <th>Date Paid</th>
+                    <th>Paid Days</th>
+                    <th>Paid Nights</th>
+                    <th>Electric / Water</th>
+                    <th>Payment Method</th>
+                    <th>Paid Amount</th>
+                    <th>Unpaid Days</th>
+                    <th>Unpaid Nights</th>
+                    <th>Total</th>
+                    <th>Logged By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visit in boat.visits %}
+                    <td>{{ visit.date_in | utc_to_est}}</td>
+                    <td>{{ visit.date_paid | utc_to_est}}</td>
+                    <td>{{ visit.paid_days }}</td>
+                    <td>{{ visit.paid_nights }}</td>
+                    <td>{{ visit.paid_enw }}</td>
+                    <td>{{ visit.paid_with }}</td>
+                    <td>{{ visit.paid_amount }}</td>
+                    <td>{{ visit.unpaid_days  }}</td>
+                    <td>{{ visit.unpaid_nights }}</td>
+                    <td>{{ visit.total }}</td>
+                    <td>{{ visit.logged_by | userID_to_name }}</td>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+            </div>
     </div>
+
+
+    <div id="right-container" style="flex: 1;">
+        <div id="search-container">
+          <form method="POST" id="search">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+              {{ form.paid_days.label }}
+              {{ form.paid_days(class="form-control") }}
+            </div>
+            <div class="form-group">
+              {{ form.paid_nights.label }}
+              {{ form.paid_nights(class="form-control") }}
+            </div>
+            <div>
+                {% for subfield in form.paid_enw %}
+                    {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+                {% endfor %}
+            </div>
+            <div>
+                {% for subfield in form.paid_with %}
+                    {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+                {% endfor %}
+            </div>
+            <div id="button-container">
+              <button type="submit" class="btn btn-primary" id="login-btn" name="submit-button" value="search">Add Payment</button>
+            </div>
+          </form>
+        </div>
 </div>
 {%endblock%}
