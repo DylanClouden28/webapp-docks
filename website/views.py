@@ -90,5 +90,16 @@ def visits():
 
     if not boat:
         flash("Bad Boat ID", category='error')
-    print("Visits: ", boat.visits)
+    else:
+        print("Visits: ", boat.visits)
     return render_template("visits.html", form=form, boat=boat)
+
+@views.route('/update_payment/<int:visitid>', methods=['POST'])
+def update_payment(visitid):
+    form = PaymentForm(request.form)
+    if form.validate():
+        edit_payment(visitid, form)
+        return redirect(url_for('views.visits', id=visitid))
+    else:
+        flash("Invalid form reload or relogin", category="error")
+        return render_template('views.edit.html', form=form)

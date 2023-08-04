@@ -36,6 +36,8 @@ def create_app():
 
     @app.template_filter('utc_to_est')
     def utc_to_est_filter(s):
+        if s == None:
+            return "None"
         fmt = "%Y-%m-%d %H:%M:%S.%f+00:00"
         utc_datetime = datetime.strptime(s, fmt)
 
