@@ -94,7 +94,7 @@ def searchBoatInDB(current_page, form):
         return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
     
     if not resultsToday or not results:
-        flash('No Boats Found in Database', category='error')
+        flash('No Boats Found in Database', category='error')  
     print(results)
     return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
 
@@ -242,6 +242,29 @@ def calcPrice(boat, days, nights, enw):
             nightsTotal = (35 + enwTotal) * nights
 
     return daysTotal, nightsTotal
+
+def edit_payment(visitid, form):
+    sanitize_paid_days = sanitize(form.paid_days.data)
+    sanitize_paid_nights = sanitize(form.paid_nights.data)
+    paid_enw = form.paid_enw.data
+    paid_with = form.paid_with.data
+    current_visit = Visit.query.get(visitid)
+    boat = getBoatById(current_visit.boat_id)
+    current_visit.paid_days = sanitize_paid_days
+    current_visit.paid_nights = sanitize_paid_nights
+    if paid_enw == "Yes":
+        current_visit.paid_enw = True
+    else:
+        current_visit.paid_enw = False
+    current_visit.paid_with = paid_with
+    daysTotal, nightsTotal = calcPrice(boat, int(sanitize_paid_days), int(sanitize_paid_nights), current_visit.paid_enw)
+    current_visit.paid_amount = daysTotal + nightsTotal
+    lastTotal = 0
+    if len(boat.visits) > 1:
+        lastTotal = boat.visits[-2].total
+    current_visit.total = lastTotal + current_visit.paid_amount
+    current_visit.date_paid = datetime.now(timezone.utc)
+    db.session.commit()
 
 def add_payment(current_page, form, boat):
     sanitize_paid_days = sanitize(form.paid_days.data)

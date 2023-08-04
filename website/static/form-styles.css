@@ -58,8 +58,13 @@ h2 {
 
 /* Adjust the size of radio buttons */
 .form-check-input {
-  width: 40px;  /* Adjust as needed */
-  height: 40px;  /* Adjust as needed */
+  width: auto;  /* Adjust as needed */
+  height: auto;  /* Adjust as needed */
+}
+
+input[type='radio'] {
+  width: 25px; 
+  height: 25px; 
 }
 
 .form-group input {

@@ -1,7 +1,11 @@
 {% extends "base.html" %} 
 {% block title %}Boats Visits{% endblock %} 
 {%block head%}<a href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number, id=boat.id) }}"id="home-btn">Back</a>{%endblock%}
-{%block header%}<link rel="stylesheet" href="static/form-styles.css">{%endblock%}
+{%block header%}<link rel="stylesheet" href="static/form-styles.css"><style>.container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}</style>{%endblock%}
 {%block styles%}static/visit-styles.css{%endblock%}
 {% block content%}
 <div id="main-container">
@@ -22,21 +26,58 @@
                     <th>Unpaid Nights</th>
                     <th>Total</th>
                     <th>Logged By</th>
+                    <th>Edit</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for visit in boat.visits %}
-                    <td>{{ visit.date_in | utc_to_est}}</td>
-                    <td>{{ visit.date_paid | utc_to_est}}</td>
-                    <td>{{ visit.paid_days }}</td>
-                    <td>{{ visit.paid_nights }}</td>
-                    <td>{{ visit.paid_enw }}</td>
-                    <td>{{ visit.paid_with }}</td>
-                    <td>{{ visit.paid_amount }}</td>
-                    <td>{{ visit.unpaid_days  }}</td>
-                    <td>{{ visit.unpaid_nights }}</td>
-                    <td>{{ visit.total }}</td>
-                    <td>{{ visit.logged_by | userID_to_name }}</td>
+                    <tr id="row-{{ visit.id }}">
+                      <td ><span class="text">{{ visit.date_in | utc_to_est}}</span></td>
+                      <td ><span class="text">{{ visit.date_paid | utc_to_est}}</span></td>
+                      <td class="editable">
+                        <span class="text">{{ visit.paid_days }}</span> 
+                        <input type="text" name="paid_days" form="edit" value="{{ visit.paid_days }}">
+                        </td>
+                      <td class="editable">
+                        <span class="text">{{ visit.paid_nights }}</span>
+                        <input type="text" name="paid_nights" form="edit" value="{{ visit.paid_nights }}">
+                        </td>
+                      <td class="editable">
+                        <span class="text">{{ visit.paid_enw }}</span>
+                        <div class="radio-group" style="display: none;">
+                            <input form="edit" type="radio" name="paid_enw" value="Yes" {% if visit.paid_enw == True %}checked{% endif %}> Yes
+                            <input form="edit"type="radio" name="paid_enw" value="No" {% if visit.paid_enw == False %}checked{% endif %}> No
+                        </div>
+                        </td>
+                      <td class="editable">
+                        <span class="text">{{ visit.paid_with }}</span>
+                        <div class="radio-group" style="display: none;">
+                            <input  form="edit" type="radio" name="paid_with" value="Cash" {% if visit.paid_with == 'Cash' %}checked{% endif %}> Cash
+                            <input  form="edit" type="radio" name="paid_with" value="Check" {% if visit.paid_with == 'Check' %}checked{% endif %}> Check
+                            <input  form="edit" type="radio" name="paid_with" value="Charge" {% if visit.paid_with == 'Charge' %}checked{% endif %}> Charge
+                        </div>
+                        
+                    </td>
+                      <td>{{ visit.paid_amount }}</td>
+                      <td>{{ visit.unpaid_days  }}</td>
+                      <td>{{ visit.unpaid_nights }}</td>
+                      <td>{{ visit.total }}</td>
+                      <td>{{ visit.logged_by | userID_to_name }}</td>
+                      <td>
+                        <button class="edit-button">
+                            <img src="static/edit.svg" alt="Edit" width="20" height="20">
+                        </button>
+                        <form class="edit-form" style="display: none;" method="POST" id="edit" action="{{ url_for('views.update_payment', visitid=visit.id) }}">
+                          {{ form.hidden_tag() }}
+                            <button type="submit" class="save-button">
+                                <img src="static/check.svg" alt="Save" width="20" height="20">
+                            </button>
+                        </form>
+                        <button class="cancel-button" style="display: none;">
+                            <img src="static/cancel.svg" alt="Cancel" width="20" height="20">
+                        </button>
+                    </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
                 </table>
@@ -58,11 +99,13 @@
               {{ form.paid_nights(class="form-control") }}
             </div>
             <div>
+              <h3 class="form-check-input">Using Water or Electric</h3>
                 {% for subfield in form.paid_enw %}
                     {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
                 {% endfor %}
-            </div>
+            </div>  
             <div>
+              <h3 class="form-check-input">Payment Method</h3> 
                 {% for subfield in form.paid_with %}
                     {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
                 {% endfor %}
@@ -73,4 +116,78 @@
           </form>
         </div>
 </div>
+<script>
+    var editButtons = document.getElementsByClassName("edit-button");
+
+// Add click event listener to all edit buttons
+for (var i = 0; i < editButtons.length; i++) {
+    editButtons[i].addEventListener("click", function() {
+        var row = this.parentElement.parentElement;
+        var form = row.getElementsByClassName("edit-form")[0];
+        var editables = row.getElementsByClassName("editable");
+        
+        form.style.display = 'block';
+        this.style.display = 'none';
+        row.getElementsByClassName("cancel-button")[0].style.display = 'block';
+        
+        // Loop through editable cells
+        for (var j = 0; j < editables.length; j++) {
+            var inputs = editables[j].getElementsByTagName('input');
+            var radioGroups = editables[j].getElementsByClassName('radio-group');
+            for (var k = 0; k < inputs.length; k++) {
+                inputs[k].style.display = 'inline';
+            }
+            for (var k = 0; k < radioGroups.length; k++) {
+                radioGroups[k].style.display = 'inline';
+            }
+            var text = editables[j].getElementsByClassName('text')[0];
+            text.style.display = 'none';
+        }
+    });
+}
+
+// Add click event listener to all cancel buttons
+var cancelButtons = document.getElementsByClassName("cancel-button");
+for (var i = 0; i < cancelButtons.length; i++) {
+    cancelButtons[i].addEventListener("click", function() {
+        var row = this.parentElement.parentElement;
+        var form = row.getElementsByClassName("edit-form")[0];
+        var editables = row.getElementsByClassName("editable");
+        
+        form.style.display = 'none';
+        this.style.display = 'none';
+        row.getElementsByClassName("edit-button")[0].style.display = 'block';
+        
+        // Loop through editable cells
+        for (var j = 0; j < editables.length; j++) {
+            var inputs = editables[j].getElementsByTagName('input');
+            var radioGroups = editables[j].getElementsByClassName('radio-group');
+            for (var k = 0; k < inputs.length; k++) {
+                inputs[k].style.display = 'none';
+            }
+            for (var k = 0; k < radioGroups.length; k++) {
+                radioGroups[k].style.display = 'none';
+            }
+            var text = editables[j].getElementsByClassName('text')[0];
+            text.style.display = 'inline';
+        }
+    });
+}
+
+// On page load, hide all input fields in editable cells
+window.onload = function() {
+    var editables = document.getElementsByClassName("editable");
+    for (var i = 0; i < editables.length; i++) {
+        var inputs = editables[i].getElementsByTagName('input');
+        var radioGroups = editables[i].getElementsByClassName('radio-group');
+        for (var j = 0; j < inputs.length; j++) {
+            inputs[j].style.display = 'none';
+        }
+        for (var j = 0; j < radioGroups.length; j++) {
+            radioGroups[j].style.display = 'none';
+        }
+    }
+}
+</script>
+
 {%endblock%}
