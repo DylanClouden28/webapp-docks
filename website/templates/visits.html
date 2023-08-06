@@ -37,9 +37,17 @@
 
   .boat-info-item h3 {
       margin: 0;
+      padding-top: 0px;
+      padding-bottom: 0px;
       font-size: 18px;
       color: #eeeeee;
       font-weight: normal;
+  }
+
+  h2 {
+      margin: 0;
+      padding-top: 0px;
+      padding-bottom: 0px;
   }
 
   header {
@@ -47,6 +55,28 @@
     justify-content: flex-start;
     padding: 0px;
   }
+
+  #add-button-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+  #add-button-container img {
+      margin-right: 10px;
+  }
+  #table-container{
+    padding-bottom: 20px;
+  }
+  .save-button, .cancel-button {
+}
+#table-container {
+  height: 300px; 
+  overflow-y: auto;
+  background-color: #393e46;
+  border-radius: 5px;
+}
 </style>
 
 <div id="boat-info" class="boat-info-container">
@@ -62,7 +92,6 @@
 <div id="main-container">
     <div id="left-container" style="flex: 1;">
             <div id="table-container">
-                <h2>Visits</h2>
                 <table id="search-results">
                 <thead>
                     <tr>
@@ -83,56 +112,72 @@
                 <tbody>
                     {% for visit in boat.visits %}
                     <tr id="row-{{ visit.id }}">
-                      <td ><span class="text">{{ visit.date_in | utc_to_est}}</span></td>
-                      <td ><span class="text">{{ visit.date_paid | utc_to_est}}</span></td>
-                      <td class="editable">
-                        <span class="text">{{ visit.paid_days }}</span> 
-                        <input type="text" name="paid_days" form="edit" value="{{ visit.paid_days }}">
-                        </td>
-                      <td class="editable">
-                        <span class="text">{{ visit.paid_nights }}</span>
-                        <input type="text" name="paid_nights" form="edit" value="{{ visit.paid_nights }}">
-                        </td>
-                      <td class="editable">
-                        <span class="text">{{ visit.paid_enw }}</span>
-                        <div class="radio-group" style="display: none;">
-                            <input form="edit" type="radio" name="paid_enw" value="Yes" {% if visit.paid_enw == True %}checked{% endif %}> Yes
-                            <input form="edit"type="radio" name="paid_enw" value="No" {% if visit.paid_enw == False %}checked{% endif %}> No
-                        </div>
-                        </td>
-                      <td class="editable">
-                        <span class="text">{{ visit.paid_with }}</span>
-                        <div class="radio-group" style="display: none;">
-                            <input  form="edit" type="radio" name="paid_with" value="Cash" {% if visit.paid_with == 'Cash' %}checked{% endif %}> Cash
-                            <input  form="edit" type="radio" name="paid_with" value="Check" {% if visit.paid_with == 'Check' %}checked{% endif %}> Check
-                            <input  form="edit" type="radio" name="paid_with" value="Charge" {% if visit.paid_with == 'Charge' %}checked{% endif %}> Charge
-                        </div>
-                        
-                    </td>
-                      <td>{{ visit.paid_amount }}</td>
-                      <td>{{ visit.unpaid_days  }}</td>
-                      <td>{{ visit.unpaid_nights }}</td>
-                      <td>{{ visit.total }}</td>
-                      <td>{{ visit.logged_by | userID_to_name }}</td>
-                      <td>
-                        <button class="edit-button">
-                            <img src="static/edit.svg" alt="Edit" width="20" height="20">
-                        </button>
-                        <form class="edit-form" style="display: none;" method="POST" id="edit" action="{{ url_for('views.update_payment', visitid=visit.id) }}">
-                          {{ form.hidden_tag() }}
-                            <button type="submit" class="save-button">
-                                <img src="static/check.svg" alt="Save" width="20" height="20">
+                      <form class="edit-form" method="POST" action="{{ url_for('views.update_payment', visitid=visit.id, id=boat.id) }}">
+                        {{ form.hidden_tag() }}
+                        <td ><span class="text">{{ visit.date_in | utc_to_est}}</span></td>
+                        <td ><span class="text">{{ visit.date_paid | utc_to_est}}</span></td>
+                        <td class="editable">
+                          <span class="text">{{ visit.paid_days }}</span> 
+                          <input type="text" name="paid_days" value="{{ visit.paid_days }}">
+                          </td>
+                        <td class="editable">
+                          <span class="text">{{ visit.paid_nights }}</span>
+                          <input type="text" name="paid_nights" value="{{ visit.paid_nights }}">
+                          </td>
+                        <td class="editable">
+                          <span class="text">{{ visit.paid_enw }}</span>
+                          <div class="radio-group" style="display: none;">
+                              <input type="radio" name="paid_enw" value="Yes" {% if visit.paid_enw == True %}checked{% endif %}> Yes
+                              <input type="radio" name="paid_enw" value="No" {% if visit.paid_enw == False %}checked{% endif %}> No
+                          </div>
+                          </td>
+                        <td class="editable">
+                          <span class="text">{{ visit.paid_with }}</span>
+                          <div class="radio-group" style="display: none;">
+                              <input type="radio" name="paid_with" value="Cash" {% if visit.paid_with == 'Cash' %}checked{% endif %}> Cash
+                              <input type="radio" name="paid_with" value="Check" {% if visit.paid_with == 'Check' %}checked{% endif %}> Check
+                              <input type="radio" name="paid_with" value="Charge" {% if visit.paid_with == 'Charge' %}checked{% endif %}> Charge
+                          </div>           
+                          </td>
+                          <td>${{ visit.paid_amount }}0</td>
+                          <td>{{ visit.unpaid_days  }}</td>
+                          <td>{{ visit.unpaid_nights }}</td>
+                          <td>${{ visit.total }}0</td>
+                          <td>
+                            {% if visit.logged_by == None %}
+                                None
+                            {% else %}
+                                {{ visit.logged_by|userID_to_name }}
+                            {% endif %}
+                          </td>
+                          <td>
+                            <button type="button" class="edit-button">
+                              <img src="static/edit.svg" alt="Edit" width="20" height="20">
+                            </button>                          
+                            <button type="submit" class="save-button" style="display: none;">
+                              <img src="static/check.svg" alt="Save" width="20" height="20">
                             </button>
-                        </form>
-                        <button class="cancel-button" style="display: none;">
-                            <img src="static/cancel.svg" alt="Cancel" width="20" height="20">
-                        </button>
-                    </td>
+                            <button type="button" class="cancel-button" style="display: none;">
+                              <img src="static/cancel.svg" alt="Cancel" width="20" height="20">
+                            </button>
+                          </td>
+                      </form>
                     </tr>
                     {% endfor %}
                 </tbody>
                 </table>
             </div>
+            <form class="add-visit" style="display: none;" method="POST" id="add-visit">
+              {{ form.hidden_tag() }}
+              <div id="button-container">
+                  <button type="submit"  class="btn btn-primary" id="login-btn" name="submit-button" value="add_new">
+                      <div id="add-button-container">
+                          <img src="static/more.svg" alt="Add-visit" width="20" height="20"> 
+                          Blank Visit
+                      </div>
+                  </button>
+              </div>
+            </form>
             </div>
     </div>
 
@@ -162,13 +207,22 @@
                 {% endfor %}
             </div>
             <div id="button-container">
-              <button type="submit" class="btn btn-primary" id="login-btn" name="submit-button" value="search">Add Payment</button>
+              <div id="button-container">
+                <button type="submit" class="btn btn-primary" id="login-btn" name="submit-button" value="search">
+                  <div id="add-button-container">
+                    <img src="static/more.svg" alt="Add-visit" width="20" height="20"> 
+                    Payment
+                  </div>
+                </button>
+              </div>
             </div>
           </form>
         </div>
 </div>
+
 <script>
-    var editButtons = document.getElementsByClassName("edit-button");
+var editButtons = document.getElementsByClassName("edit-button");
+var addVisitForm = document.getElementById("add-visit");
 
 // Add click event listener to all edit buttons
 for (var i = 0; i < editButtons.length; i++) {
@@ -180,6 +234,9 @@ for (var i = 0; i < editButtons.length; i++) {
         form.style.display = 'block';
         this.style.display = 'none';
         row.getElementsByClassName("cancel-button")[0].style.display = 'block';
+        row.getElementsByClassName("save-button")[0].style.display = 'block';  // Add this line to show the save button
+        
+        addVisitForm.style.display = 'block'; // Display add button
         
         // Loop through editable cells
         for (var j = 0; j < editables.length; j++) {
@@ -208,6 +265,9 @@ for (var i = 0; i < cancelButtons.length; i++) {
         form.style.display = 'none';
         this.style.display = 'none';
         row.getElementsByClassName("edit-button")[0].style.display = 'block';
+        row.getElementsByClassName("save-button")[0].style.display = 'none';  // Add this line to hide the save button again
+        
+        addVisitForm.style.display = 'none'; // Hide add button
         
         // Loop through editable cells
         for (var j = 0; j < editables.length; j++) {
@@ -239,6 +299,8 @@ window.onload = function() {
         }
     }
 }
+
 </script>
+
 
 {%endblock%}

@@ -275,6 +275,8 @@ def add_payment(current_page, form, boat):
 
     if boat.current_boats_id:
         current_visit = boat.visits[-1]
+    else:
+        current_visit = Visit()
 
     current_visit.paid_days = sanitize_paid_days
     current_visit.paid_nights = sanitize_paid_nights
@@ -290,6 +292,34 @@ def add_payment(current_page, form, boat):
         lastTotal = boat.visits[-2].total
     current_visit.total = lastTotal + current_visit.paid_amount
     current_visit.date_paid = datetime.now(timezone.utc)
+    db.session.commit()
+
+def add_visit(current_page, form, boat):
+    sanitize_paid_days = sanitize(form.paid_days.data)
+    sanitize_paid_nights = sanitize(form.paid_nights.data)
+    paid_enw = form.paid_enw.data
+    paid_with = form.paid_with.data
+    current_visit = None
+
+    current_visit = Visit()
+
+    current_visit.paid_days = sanitize_paid_days
+    current_visit.paid_nights = sanitize_paid_nights
+    if paid_enw == "Yes":
+        current_visit.paid_enw = True
+    else:
+        current_visit.paid_enw = False
+    current_visit.paid_with = paid_with
+    daysTotal, nightsTotal = calcPrice(boat, int(sanitize_paid_days), int(sanitize_paid_nights), current_visit.paid_enw)
+    current_visit.paid_amount = daysTotal + nightsTotal
+    lastTotal = 0
+    if len(boat.visits) > 1:
+        lastTotal = boat.visits[-2].total
+    current_visit.total = lastTotal + current_visit.paid_amount
+    current_visit.date_in = datetime.now(timezone.utc)
+    current_visit.boat_id = boat.id
+    print(current_visit)
+    db.session.add(current_visit)
     db.session.commit()
 
         

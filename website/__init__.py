@@ -51,6 +51,9 @@ def create_app():
         user = load_user(int(s))
         return user.first_name
 
+    @app.template_filter('reverse')
+    def reverse_filter(sequence):
+        return reversed(sequence)
 
     return app
 

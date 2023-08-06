@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from . import db
 from .models import Boat, CurrentBoats, Visit
 from .forms import BoatLogForm, SearchForm, PaymentForm
-from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment
+from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit
 import re
 
 views = Blueprint('views', __name__)
@@ -78,28 +78,37 @@ def log_boat():
 @login_required
 def visits():
     form = PaymentForm()
+    button_pressed = request.form.get('submit-button')
+    print("Button pressed is: " + str(button_pressed))
+    
     boat = getBoatById(request.args.get('id', ''))
-    if form.validate_on_submit():
-        if request.method == "POST":
-            button_pressed = request.form.get('submit-button')
-            print("Button pressed is: " + str(button_pressed))
-            if button_pressed == "search":
-                add_payment("visits.html", form, boat)
-            if button_pressed == "edit":
-                update_payment()
 
     if not boat:
         flash("Bad Boat ID", category='error')
-    else:
-        print("Visits: ", boat.visits)
+    if request.method == "POST":
+        if form.validate_on_submit():
+                if button_pressed == "search":
+                    add_payment("visits.html", form, boat)
+        elif button_pressed == "add_new":
+            form.paid_days.data = "0"
+            form.paid_nights.data = "0"
+            form.paid_enw.data = None
+            print("add new visit")
+            add_visit("visits.html", form, boat)
+        else:
+            flash("form invalid", category="error")
     return render_template("visits.html", form=form, boat=boat)
 
-@views.route('/update_payment/<int:visitid>', methods=['POST'])
-def update_payment(visitid):
+@views.route('/update_payment', methods=['POST'])
+def update_payment():
     form = PaymentForm(request.form)
+    boat = getBoatById(request.args.get('id', ''))
+    visitid = request.args.get('visitid', '')
     if form.validate():
         edit_payment(visitid, form)
-        return redirect(url_for('views.visits', id=visitid))
+        return redirect(url_for('views.visits', id=boat.id))
     else:
+        print(form.errors)
         flash("Invalid form reload or relogin", category="error")
-        return render_template('views.edit.html', form=form)
+        return redirect(url_for('views.visits', id=boat.id))
+    
