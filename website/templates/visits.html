@@ -13,8 +13,7 @@
 <style>
   .container {
       width: 100%;
-      margin: 0 auto;
-      padding: 20px;
+      padding: 1.25em;
   }
 
   .boat-info-container {
@@ -23,8 +22,8 @@
       justify-content: space-between;
       width: 98%;
       background: #393e46;
-      padding: 20px;
-      margin-bottom: 20px;
+      padding: 1.25em;
+      margin-bottom: 1.25em;
       border-radius: 5px;
       box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
   }
@@ -32,28 +31,22 @@
   .boat-info-item {
       flex: 1;
       text-align: center;
-      margin: 0 5px;
+      margin: 0 0.3125em;
   }
 
-  .boat-info-item h3 {
+  .boat-info-item h3, h2 {
       margin: 0;
-      padding-top: 0px;
-      padding-bottom: 0px;
-      font-size: 18px;
+      padding-top: 0;
+      padding-bottom: 0;
+      font-size: 1.125em;
       color: #eeeeee;
       font-weight: normal;
-  }
-
-  h2 {
-      margin: 0;
-      padding-top: 0px;
-      padding-bottom: 0px;
   }
 
   header {
     display: flex;
     justify-content: flex-start;
-    padding: 0px;
+    padding: 0;
   }
 
   #add-button-container {
@@ -64,34 +57,25 @@
     }
 
   #add-button-container img {
-      margin-right: 10px;
+      margin-right: 0.625em;
   }
-  #table-container{
-    padding-bottom: 20px;
+
+  #table-container {
+    padding-bottom: 1.25em;
+    height: 15em;
+    overflow-y: auto;
+    background-color: #393e46;
+    border-radius: 5px;
   }
-  .save-button, .cancel-button {
-}
-#table-container {
-  height: 300px; 
-  overflow-y: auto;
-  background-color: #393e46;
-  border-radius: 5px;
-}
 
-#add-visit td {
-}
-tr.add-visit{
-  padding: 0px;
-  margin: 0px;
-}
-.add-visit-button{
-  width: 10%;
-  padding: 10px;
-  box-sizing: border-box;
-  text-align: center;
-}
-
+  .add-visit-button {
+      width: 10%;
+      padding: 0.625em;
+      box-sizing: border-box;
+      text-align: center;
+  }
 </style>
+
 
 <div id="boat-info" class="boat-info-container">
   <a href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number, id=boat.id) }}" id="home-btn">Back</a>
@@ -137,17 +121,17 @@ tr.add-visit{
                           </form>
                       </td>
                     </tr>                
-                    {% for visit in boat.visits[::-1]%}
+                    {% for visit in visits%}
                     <tr id="row-{{ visit.id }}">
                       <form class="edit-form" method="POST" action="{{ url_for('views.update_payment', visitid=visit.id, id=boat.id) }}">
                         {{ form.hidden_tag() }}
                         <td class="editable">
                           <span class="text">{{ visit.date_in | utc_to_est}}</span>
-                          <input type="text" name="paid_days" value="{{ visit.date_in | utc_to_est}}">
+                          <input type="text" name="date_in" value="{{ visit.date_in | utc_to_est}}">
                         </td>
                         <td class="editable">
                           <span class="text">{{ visit.date_paid | utc_to_est}}</span>
-                          <input type="text" name="paid_days" value="{{ visit.date_paid | utc_to_est}}">
+                          <input type="text" name="date_paid" value="{{ visit.date_paid | utc_to_est}}">
                         </td>
                         <td class="editable">
                           <span class="text">{{ visit.paid_days }}</span> 

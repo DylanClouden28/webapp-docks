@@ -5,6 +5,30 @@ from flask_login import current_user
 from .models import Boat, CurrentBoats, Visit
 from sqlalchemy import or_
 import re
+import pytz
+
+def convert_est_to_utc(est_time_str: str) -> str:
+    try:
+        # Parse the string into a datetime object
+        est_dt_naive = datetime.strptime(est_time_str, '%Y-%m-%d %I:%M %p')
+        
+        # Attach the EST timezone info
+        eastern = pytz.timezone('US/Eastern')
+        est_dt_aware = eastern.localize(est_dt_naive)
+
+        # Convert to UTCd
+        utc_dt = est_dt_aware.astimezone(pytz.utc)
+        
+        # Format datetime to string before returning
+        return utc_dt.strftime('%Y-%m-%d %H:%M:%S.%f+00:00')
+
+    except ValueError as e:
+        raise ValueError("Bad format") from e
+
+def sort_key(visit):
+    if visit.date_in is None:
+        return datetime.min
+    return datetime.strptime(visit.date_in, '%Y-%m-%d %H:%M:%S.%f+00:00')
 
 def printBoat(Boat):
     print('---------------------------------')
@@ -218,30 +242,45 @@ def addBoatToDB(current_page, form):
             flash("Boat Already Logged!", category="error")
         return redirect(url_for('views.search'))
 
-def calcPrice(boat, days, nights, enw):
+def calcPrice(boat):
     size = boat.boat_size
     daysTotal = 0
     nightsTotal = 0
     enwTotal = 0
-    if enw:
-        enwTotal = 5
-    if size == "0-25":
-        if days > 0:
-            daysTotal = 15 * days
-        if nights > 0:
-            nightsTotal = (25 + enwTotal) * nights
-    elif size == "26-40":
-        if days > 0:
-            daysTotal = 20 * days
-        if nights > 0:
-            nightsTotal = (30 + enwTotal) * nights
-    elif size == "41-Over":
-        if days > 0:
-            daysTotal = 25 * days
-        if nights > 0:
-            nightsTotal = (35 + enwTotal) * nights
+    sorted_visits = sorted(boat.visits, key=sort_key)
 
-    return daysTotal, nightsTotal
+    for index, visit in enumerate(sorted_visits):
+        print(index)
+        daysTotal = 0
+        nightsTotal = 0
+        enwTotal = 0
+        days = int(visit.paid_days)
+        nights = int(visit.paid_nights)
+        print("     days: ",days)
+        print("     nights: ", nights)
+        if visit.paid_enw:
+            enwTotal = 5
+        if size == "0-25":
+            if days > 0:
+                daysTotal = 15 * days
+            if nights > 0:
+                nightsTotal = (25 + enwTotal) * nights
+        elif size == "26-40":
+            if days > 0:
+                daysTotal = 20 * days
+            if nights > 0:
+                nightsTotal = (30 + enwTotal) * nights
+        elif size == "41-Over":
+            if days > 0:
+                daysTotal = 25 * days
+            if nights > 0:
+                nightsTotal = (35 + enwTotal) * nights
+        visit.paid_amount = daysTotal + nightsTotal
+        if index > 0:
+            visit.total = sorted_visits[index - 1].total + visit.paid_amount
+        else:
+            print(visit.paid_amount)
+            visit.total = visit.paid_amount
 
 def edit_payment(visitid, form):
     sanitize_paid_days = sanitize(form.paid_days.data)
@@ -257,13 +296,24 @@ def edit_payment(visitid, form):
     else:
         current_visit.paid_enw = False
     current_visit.paid_with = paid_with
-    daysTotal, nightsTotal = calcPrice(boat, int(sanitize_paid_days), int(sanitize_paid_nights), current_visit.paid_enw)
-    current_visit.paid_amount = daysTotal + nightsTotal
-    lastTotal = 0
-    if len(boat.visits) > 1:
-        lastTotal = boat.visits[-2].total
-    current_visit.total = lastTotal + current_visit.paid_amount
-    current_visit.date_paid = datetime.now(timezone.utc)
+    
+
+    if not form.date_in.data == current_visit.date_in:
+        try:
+            utc_result = convert_est_to_utc(form.date_in.data)
+            current_visit.date_in = utc_result
+        except ValueError:
+            flash("Bad format for date", category="error")
+
+    if current_visit.date_paid == None:
+        current_visit.date_paid = datetime.now(timezone.utc)
+    elif not form.date_paid.data == current_visit.date_paid:
+        try:
+            utc_result = convert_est_to_utc(form.date_paid.data)
+            current_visit.date_paid = utc_result
+        except ValueError:
+            flash("Bad format for date", category="error")
+    calcPrice(boat)
     db.session.commit()
 
 def add_payment(current_page, form, boat):
@@ -285,13 +335,8 @@ def add_payment(current_page, form, boat):
     else:
         current_visit.paid_enw = False
     current_visit.paid_with = paid_with
-    daysTotal, nightsTotal = calcPrice(boat, int(sanitize_paid_days), int(sanitize_paid_nights), current_visit.paid_enw)
-    current_visit.paid_amount = daysTotal + nightsTotal
-    lastTotal = 0
-    if len(boat.visits) > 1:
-        lastTotal = boat.visits[-2].total
-    current_visit.total = lastTotal + current_visit.paid_amount
     current_visit.date_paid = datetime.now(timezone.utc)
+    calcPrice(boat)
     db.session.commit()
 
 def add_visit(current_page, form, boat):
@@ -310,16 +355,9 @@ def add_visit(current_page, form, boat):
     else:
         current_visit.paid_enw = False
     current_visit.paid_with = paid_with
-    daysTotal, nightsTotal = calcPrice(boat, int(sanitize_paid_days), int(sanitize_paid_nights), current_visit.paid_enw)
-    current_visit.paid_amount = daysTotal + nightsTotal
-    lastTotal = 0
-    if len(boat.visits) > 1:
-        lastTotal = boat.visits[-2].total
-    current_visit.total = lastTotal + current_visit.paid_amount
     current_visit.date_in = datetime.now(timezone.utc)
     current_visit.boat_id = boat.id
     print(current_visit)
     db.session.add(current_visit)
+    calcPrice(boat)
     db.session.commit()
-
-        

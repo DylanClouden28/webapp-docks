@@ -5,8 +5,9 @@ from sqlalchemy import or_
 from . import db
 from .models import Boat, CurrentBoats, Visit
 from .forms import BoatLogForm, SearchForm, PaymentForm
-from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit
+from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key
 import re
+from datetime import datetime
 
 views = Blueprint('views', __name__)
 
@@ -83,6 +84,7 @@ def visits():
     print("Button pressed is: " + str(button_pressed))
     
     boat = getBoatById(request.args.get('id', ''))
+    sorted_visits = sorted(boat.visits, key=sort_key, reverse=True)
 
     if not boat:
         flash("Bad Boat ID", category='error')
@@ -98,7 +100,7 @@ def visits():
             add_visit("visits.html", form, boat)
         else:
             flash("form invalid", category="error")
-    return render_template("visits.html", form=form, boat=boat)
+    return render_template("visits.html", form=form, boat=boat, visits=sorted_visits)
 
 @views.route('/update_payment', methods=['POST'])
 def update_payment():
@@ -110,6 +112,6 @@ def update_payment():
         return redirect(url_for('views.visits', id=boat.id))
     else:
         print(form.errors)
-        flash("Invalid form reload or relogin", category="error")
+        flash("Invalid form reload or relogin" + str(form.errors), category="error")
         return redirect(url_for('views.visits', id=boat.id))
     

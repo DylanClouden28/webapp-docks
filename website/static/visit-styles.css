@@ -1,11 +1,11 @@
 body {
   margin: 0;
-  padding: 10px;
+  padding: 1em;
   font-family: Arial, sans-serif;
   background-color: #222831;
   color: #eeeeee;
   height: 100%;
-  overflow: hidden;
+  overflow: auto; /* changed from hidden */
   display: flex;
   flex-direction: column;
 }
@@ -23,9 +23,9 @@ header {
 }
 
 .alert {
-  padding: 15px;
+  padding: 1em;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 1.25em;
   border-radius: 3px;
   color: #FFFFFF;
   animation: fadein 2s;
@@ -42,18 +42,16 @@ header {
 }
 
 h2 {
-  font-size: 35px;
+  font-size: 2.25em;
   color: #eeeeee;
   width: 100%;
   text-align: center;
 }
 
-
-
 .close-btn {
   position: absolute;
-  top: 5px;
-  right: 10px;
+  top: 0.5em;
+  right: 0.75em;
   color: #FFFFFF;
   cursor: pointer;
 }
@@ -61,8 +59,9 @@ h2 {
 #main-container {
   display: flex;
   justify-content: space-between;
-  padding: 20px;
+  padding: 1.25em;
   box-sizing: border-box;
+  flex-wrap: wrap; /* to accommodate smaller screens */
 }
 
 #left-container,
@@ -73,21 +72,21 @@ h2 {
   box-sizing: border-box;
 }
 
-#right-container{
-  padding: 20px;
+#right-container {
+  padding: 1.25em;
 }
 
 #search-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 1.25em;
 }
 
 input[type="text"] {
-  margin: 5px;
+  margin: 0.5em;
   width: 100%;
-  max-width: 300px;
+  max-width: 18.75em;
 }
 
 table {
@@ -97,7 +96,7 @@ table {
 }
 
 th, td {
-  padding: 10px;
+  padding: 0.75em;
   text-align: left;
 }
 
@@ -114,24 +113,29 @@ tr:nth-child(even) {
   justify-content: center;
 }
 
-#login-btn {
-  font-size: 24px;
+#login-btn,
+#home-btn {
+  font-size: 1.5em;
   text-align: center;
   background-color: #00adb5;
   color: #eeeeee;
-  padding: 20px 40px;
+  padding: 1.25em 2.5em;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
   border-radius: 5px;
+  display: inline-block;
+  margin-right: 0.5em;
 }
 
-#login-btn:hover {
+#login-btn:hover,
+#home-btn:hover {
   background-color: #009e9a;
   transform: scale(1.05);
 }
 
-#login-btn:active {
+#login-btn:active,
+#home-btn:active {
   background-color: #00756e;
 }
 
@@ -139,29 +143,6 @@ tr:nth-child(even) {
   cursor: pointer;
 }
 
-#home-btn {
-  font-size: 18px;
-  background-color: #00adb5;
-  color: #eeeeee;
-  padding: 10px 15px;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  border-radius: 5px;
-  display: inline-block;
-  margin-right: 5px;
-}
-
-#home-btn:hover {
-  background-color: #009e9a;
-  transform: scale(1.05);
-}
-
-#home-btn:active {
-  background-color: #00756e;
-}
-
 #main-container {
-  padding:  0px;
+  padding: 0;
 }
