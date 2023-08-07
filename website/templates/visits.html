@@ -21,7 +21,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      width: 95%;
+      width: 98%;
       background: #393e46;
       padding: 20px;
       margin-bottom: 20px;
@@ -77,6 +77,20 @@
   background-color: #393e46;
   border-radius: 5px;
 }
+
+#add-visit td {
+}
+tr.add-visit{
+  padding: 0px;
+  margin: 0px;
+}
+.add-visit-button{
+  width: 10%;
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
 </style>
 
 <div id="boat-info" class="boat-info-container">
@@ -109,13 +123,32 @@
                     <th>Edit</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for visit in boat.visits %}
+                <tbody> 
+                    <tr class="add-visit" style="display: none;" id="add-visit">
+                      <td colspan="12">
+                          <form method="POST">
+                              {{ form.hidden_tag() }}
+                              <div id="button-container">
+                                  <button type="submit" class="btn btn-primary add-visit-button" name="submit-button" value="add_new">
+                                          <img src="static/more.svg" alt="Add-visit" width="20" height="20"> 
+                                          Blank Visit
+                                  </button>
+                              </div>
+                          </form>
+                      </td>
+                    </tr>                
+                    {% for visit in boat.visits[::-1]%}
                     <tr id="row-{{ visit.id }}">
                       <form class="edit-form" method="POST" action="{{ url_for('views.update_payment', visitid=visit.id, id=boat.id) }}">
                         {{ form.hidden_tag() }}
-                        <td ><span class="text">{{ visit.date_in | utc_to_est}}</span></td>
-                        <td ><span class="text">{{ visit.date_paid | utc_to_est}}</span></td>
+                        <td class="editable">
+                          <span class="text">{{ visit.date_in | utc_to_est}}</span>
+                          <input type="text" name="paid_days" value="{{ visit.date_in | utc_to_est}}">
+                        </td>
+                        <td class="editable">
+                          <span class="text">{{ visit.date_paid | utc_to_est}}</span>
+                          <input type="text" name="paid_days" value="{{ visit.date_paid | utc_to_est}}">
+                        </td>
                         <td class="editable">
                           <span class="text">{{ visit.paid_days }}</span> 
                           <input type="text" name="paid_days" value="{{ visit.paid_days }}">
@@ -167,17 +200,6 @@
                 </tbody>
                 </table>
             </div>
-            <form class="add-visit" style="display: none;" method="POST" id="add-visit">
-              {{ form.hidden_tag() }}
-              <div id="button-container">
-                  <button type="submit"  class="btn btn-primary" id="login-btn" name="submit-button" value="add_new">
-                      <div id="add-button-container">
-                          <img src="static/more.svg" alt="Add-visit" width="20" height="20"> 
-                          Blank Visit
-                      </div>
-                  </button>
-              </div>
-            </form>
             </div>
     </div>
 
@@ -221,84 +243,89 @@
 </div>
 
 <script>
-var editButtons = document.getElementsByClassName("edit-button");
-var addVisitForm = document.getElementById("add-visit");
-
-// Add click event listener to all edit buttons
-for (var i = 0; i < editButtons.length; i++) {
-    editButtons[i].addEventListener("click", function() {
-        var row = this.parentElement.parentElement;
-        var form = row.getElementsByClassName("edit-form")[0];
-        var editables = row.getElementsByClassName("editable");
-        
-        form.style.display = 'block';
-        this.style.display = 'none';
-        row.getElementsByClassName("cancel-button")[0].style.display = 'block';
-        row.getElementsByClassName("save-button")[0].style.display = 'block';  // Add this line to show the save button
-        
-        addVisitForm.style.display = 'block'; // Display add button
-        
-        // Loop through editable cells
-        for (var j = 0; j < editables.length; j++) {
-            var inputs = editables[j].getElementsByTagName('input');
-            var radioGroups = editables[j].getElementsByClassName('radio-group');
-            for (var k = 0; k < inputs.length; k++) {
-                inputs[k].style.display = 'inline';
-            }
-            for (var k = 0; k < radioGroups.length; k++) {
-                radioGroups[k].style.display = 'inline';
-            }
-            var text = editables[j].getElementsByClassName('text')[0];
-            text.style.display = 'none';
-        }
-    });
-}
-
-// Add click event listener to all cancel buttons
-var cancelButtons = document.getElementsByClassName("cancel-button");
-for (var i = 0; i < cancelButtons.length; i++) {
-    cancelButtons[i].addEventListener("click", function() {
-        var row = this.parentElement.parentElement;
-        var form = row.getElementsByClassName("edit-form")[0];
-        var editables = row.getElementsByClassName("editable");
-        
-        form.style.display = 'none';
-        this.style.display = 'none';
-        row.getElementsByClassName("edit-button")[0].style.display = 'block';
-        row.getElementsByClassName("save-button")[0].style.display = 'none';  // Add this line to hide the save button again
-        
-        addVisitForm.style.display = 'none'; // Hide add button
-        
-        // Loop through editable cells
-        for (var j = 0; j < editables.length; j++) {
-            var inputs = editables[j].getElementsByTagName('input');
-            var radioGroups = editables[j].getElementsByClassName('radio-group');
-            for (var k = 0; k < inputs.length; k++) {
-                inputs[k].style.display = 'none';
-            }
-            for (var k = 0; k < radioGroups.length; k++) {
-                radioGroups[k].style.display = 'none';
-            }
-            var text = editables[j].getElementsByClassName('text')[0];
-            text.style.display = 'inline';
-        }
-    });
-}
-
-// On page load, hide all input fields in editable cells
-window.onload = function() {
-    var editables = document.getElementsByClassName("editable");
-    for (var i = 0; i < editables.length; i++) {
-        var inputs = editables[i].getElementsByTagName('input');
-        var radioGroups = editables[i].getElementsByClassName('radio-group');
-        for (var j = 0; j < inputs.length; j++) {
-            inputs[j].style.display = 'none';
-        }
-        for (var j = 0; j < radioGroups.length; j++) {
-            radioGroups[j].style.display = 'none';
-        }
-    }
-}
+  var editButtons = document.getElementsByClassName("edit-button");
+  var addVisitForm = document.getElementById("add-visit");
+  
+  // Add click event listener to all edit buttons
+  for (var i = 0; i < editButtons.length; i++) {
+      editButtons[i].addEventListener("click", function() {
+          var row = this.parentElement.parentElement;
+          var form = row.getElementsByClassName("edit-form")[0];
+          var editables = row.getElementsByClassName("editable");
+  
+          form.style.display = 'block';
+          this.style.display = 'none';
+          row.getElementsByClassName("cancel-button")[0].style.display = 'block';
+          row.getElementsByClassName("save-button")[0].style.display = 'block'; 
+          
+          // Update the colspan and display the add button
+          var td = addVisitForm.querySelector("td");
+          td.setAttribute("colspan", "12");
+          addVisitForm.style.display = 'table-row';
+          void addVisitForm.offsetHeight; // Force a reflow
+  
+          // Loop through editable cells
+          for (var j = 0; j < editables.length; j++) {
+              var inputs = editables[j].getElementsByTagName('input');
+              var radioGroups = editables[j].getElementsByClassName('radio-group');
+              for (var k = 0; k < inputs.length; k++) {
+                  inputs[k].style.display = 'inline';
+              }
+              for (var k = 0; k < radioGroups.length; k++) {
+                  radioGroups[k].style.display = 'inline';
+              }
+              var text = editables[j].getElementsByClassName('text')[0];
+              text.style.display = 'none';
+          }
+      });
+  }
+  
+  // Add click event listener to all cancel buttons
+  var cancelButtons = document.getElementsByClassName("cancel-button");
+  for (var i = 0; i < cancelButtons.length; i++) {
+      cancelButtons[i].addEventListener("click", function() {
+          var row = this.parentElement.parentElement;
+          var form = row.getElementsByClassName("edit-form")[0];
+          var editables = row.getElementsByClassName("editable");
+          
+          form.style.display = 'none';
+          this.style.display = 'none';
+          row.getElementsByClassName("edit-button")[0].style.display = 'block';
+          row.getElementsByClassName("save-button")[0].style.display = 'none';
+          
+          addVisitForm.style.display = 'none'; // Hide add button
+          
+          // Loop through editable cells
+          for (var j = 0; j < editables.length; j++) {
+              var inputs = editables[j].getElementsByTagName('input');
+              var radioGroups = editables[j].getElementsByClassName('radio-group');
+              for (var k = 0; k < inputs.length; k++) {
+                  inputs[k].style.display = 'none';
+              }
+              for (var k = 0; k < radioGroups.length; k++) {
+                  radioGroups[k].style.display = 'none';
+              }
+              var text = editables[j].getElementsByClassName('text')[0];
+              text.style.display = 'inline';
+          }
+      });
+  }
+  
+  // On page load, hide all input fields in editable cells
+  window.onload = function() {
+      var editables = document.getElementsByClassName("editable");
+      for (var i = 0; i < editables.length; i++) {
+          var inputs = editables[i].getElementsByTagName('input');
+          var radioGroups = editables[i].getElementsByClassName('radio-group');
+          for (var j = 0; j < inputs.length; j++) {
+              inputs[j].style.display = 'none';
+          }
+          for (var j = 0; j < radioGroups.length; j++) {
+              radioGroups[j].style.display = 'none';
+          }
+      }
+  }
+  
 
 </script>
 
