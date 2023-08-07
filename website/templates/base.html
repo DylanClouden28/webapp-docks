@@ -9,6 +9,12 @@
   {%block head%}{%endblock%}
 </head>
 <body>
+  <style>
+  .fade-out {
+  opacity: 0;
+  transition: opacity 3s ease-out;
+  } 
+  </style>
   <div id="content-container">
     <header>
       <h1>{%block header%}Gateway Harbor Sign Up{%endblock%}</h1>
@@ -33,6 +39,18 @@
         this.parentElement.style.display = 'none';
       });
     }
+  
+    var alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+      if (alert.classList.contains('alert-success')) {
+        setTimeout(function() {
+          alert.classList.add('fade-out');
+          setTimeout(function() {
+            alert.style.display = 'none';
+          }, 3000); // hide it after 3 seconds of fade-out transition
+        }, 1000); // start the fade-out after 3 seconds
+      }
+    });
   </script>
 
 

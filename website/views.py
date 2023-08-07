@@ -55,7 +55,8 @@ def log_boat():
                 return redirect(url_for('views.search'))
             elif button_pressed == 'visits':
                 currentboatID = request.args.get('id', '')
-                return redirect(url_for('views.visits', id=currentboatID))
+                boat = getBoatById(currentboatID)
+                return redirect(url_for('views.visits', id=currentboatID, boat=boat))
     else:
         print(form.errors)
     if request.method == "GET":
@@ -72,7 +73,7 @@ def log_boat():
            form.owner_name.data = result.owner_name
            form.email.data = result.email
            form.zipcode.data = result.zipcode
-    return render_template("log-boat.html", form=form)
+    return render_template("log-boat.html", form=form, boat=result)
 
 @views.route('/visits' , methods=['GET','POST'])
 @login_required
