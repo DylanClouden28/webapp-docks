@@ -69,11 +69,23 @@
   }
 
   .add-visit-button {
-      width: 10%;
+      width: 100%;
       padding: 0.625em;
       box-sizing: border-box;
-      text-align: center;
   }
+  tr.add-blank-visit td{
+    padding: 0.5em;
+    text-align: center;
+  }
+  .add-blank-visit-button{
+    margin-bottom: 0px;
+    width: 90%;
+    padding: 0.25em 0.5em;
+  }
+
+  #search-results tr.highlighted {
+    background-color: #2aaeae8e
+}
 </style>
 
 
@@ -108,16 +120,14 @@
                     </tr>
                 </thead>
                 <tbody> 
-                    <tr class="add-visit" style="display: none;" id="add-visit">
+                    <tr class="add-blank-visit" id="add-blank-visit">
                       <td colspan="12">
                           <form method="POST">
-                              {{ form.hidden_tag() }}
-                              <div id="button-container">
-                                  <button type="submit" class="btn btn-primary add-visit-button" name="submit-button" value="add_new">
-                                          <img src="static/more.svg" alt="Add-visit" width="20" height="20"> 
-                                          Blank Visit
-                                  </button>
-                              </div>
+                            {{ form.hidden_tag() }}
+                            <button type="submit" class="btn btn-primary add-blank-visit-button" name="submit-button" value="add_new">
+                              <img src="static/more.svg" alt="Add-blank-visit" width="20" height="20"> 
+                              Blank Visit
+                            </button>
                           </form>
                       </td>
                     </tr>                
@@ -242,12 +252,6 @@
           row.getElementsByClassName("cancel-button")[0].style.display = 'block';
           row.getElementsByClassName("save-button")[0].style.display = 'block'; 
           
-          // Update the colspan and display the add button
-          var td = addVisitForm.querySelector("td");
-          td.setAttribute("colspan", "12");
-          addVisitForm.style.display = 'table-row';
-          void addVisitForm.offsetHeight; // Force a reflow
-  
           // Loop through editable cells
           for (var j = 0; j < editables.length; j++) {
               var inputs = editables[j].getElementsByTagName('input');
@@ -276,8 +280,6 @@
           this.style.display = 'none';
           row.getElementsByClassName("edit-button")[0].style.display = 'block';
           row.getElementsByClassName("save-button")[0].style.display = 'none';
-          
-          addVisitForm.style.display = 'none'; // Hide add button
           
           // Loop through editable cells
           for (var j = 0; j < editables.length; j++) {
@@ -310,6 +312,49 @@
       }
   }
   
+
+</script>
+
+
+<script>
+  //Code for adding highlights to rows
+  document.addEventListener("DOMContentLoaded", function() {
+    const tableBody = document.querySelector("#search-results tbody");
+    const submitButton = document.getElementById("login-btn");
+    const searchForm = document.getElementById("search");
+    const selectedRowIdInput = searchForm.querySelector("#selectedRowId");
+    let selectedRow = null;
+
+    tableBody.addEventListener("click", function(event) {
+        // Get the closest tr element
+        const clickedRow = event.target.closest("tr");
+
+        // If no tr was found or the tr is the add-blank-visit, return
+        if (!clickedRow || clickedRow.classList.contains("add-blank-visit")) return;
+
+        // If a row was previously selected, remove its highlight
+        if (selectedRow) {
+            selectedRow.classList.remove("highlighted");
+        }
+
+        // Highlight the clicked row
+        clickedRow.classList.add("highlighted");
+        selectedRow = clickedRow;
+
+        // Extract ID from the row's ID attribute and set it to the hidden input
+        const rowId = clickedRow.id.replace('row-', '');
+        console.log("Setting hidden input to: " + rowId);
+        selectedRowIdInput.value = rowId;
+
+        // Enable the submit button
+        submitButton.disabled = false;
+    });
+
+    // Initially disable the submit button
+    submitButton.disabled = true;
+});
+
+
 
 </script>
 

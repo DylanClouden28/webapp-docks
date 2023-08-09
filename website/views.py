@@ -7,7 +7,7 @@ from .models import Boat, CurrentBoats, Visit
 from .forms import BoatLogForm, SearchForm, PaymentForm
 from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 views = Blueprint('views', __name__)
 
@@ -81,17 +81,22 @@ def log_boat():
 def visits():
     form = PaymentForm()
     button_pressed = request.form.get('submit-button')
+    selected_row_id = request.form.get('selectedRowId')
     print("Button pressed is: " + str(button_pressed))
+    print("Selected row ID is:", selected_row_id)
     
     boat = getBoatById(request.args.get('id', ''))
     sorted_visits = sorted(boat.visits, key=sort_key, reverse=True)
+    if button_pressed == "search":
+        form.date_paid.data = datetime.now(timezone.utc) 
+        form.date_in.data = Visit.query.get(selected_row_id).date_in
 
     if not boat:
         flash("Bad Boat ID", category='error')
     if request.method == "POST":
         if form.validate_on_submit():
                 if button_pressed == "search":
-                    add_payment("visits.html", form, boat)
+                    add_payment("visits.html", form, boat, id=selected_row_id)
         elif button_pressed == "add_new":
             form.paid_days.data = "0"
             form.paid_nights.data = "0"
@@ -99,7 +104,7 @@ def visits():
             print("add new visit")
             add_visit("visits.html", form, boat)
         else:
-            flash("form invalid", category="error")
+            flash("form invalid" + str(form.errors), category="error")
     return render_template("visits.html", form=form, boat=boat, visits=sorted_visits)
 
 @views.route('/update_payment', methods=['POST'])

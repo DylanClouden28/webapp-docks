@@ -316,17 +316,14 @@ def edit_payment(visitid, form):
     calcPrice(boat)
     db.session.commit()
 
-def add_payment(current_page, form, boat):
+def add_payment(current_page, form, boat, id):
     sanitize_paid_days = sanitize(form.paid_days.data)
     sanitize_paid_nights = sanitize(form.paid_nights.data)
     paid_enw = form.paid_enw.data
     paid_with = form.paid_with.data
     current_visit = None
 
-    if boat.current_boats_id:
-        current_visit = boat.visits[-1]
-    else:
-        current_visit = Visit()
+    current_visit = Visit.query.get(id)
 
     current_visit.paid_days = sanitize_paid_days
     current_visit.paid_nights = sanitize_paid_nights

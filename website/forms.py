@@ -1,4 +1,4 @@
-from wtforms import StringField, PasswordField, RadioField, SubmitField
+from wtforms import StringField, PasswordField, RadioField, SubmitField, HiddenField
 from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
 
@@ -23,8 +23,9 @@ class BoatLogForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class PaymentForm(FlaskForm):
+    selectedRowId = HiddenField("Feild 1")
     date_in = StringField('Date In', validators=[DataRequired()])
-    date_paid =StringField('Date Paid', validators=[DataRequired()])
+    date_paid = StringField('Date Paid', validators=[DataRequired()])
     paid_days = StringField('Paid Days', validators=[DataRequired()])
     paid_nights = StringField('Paid Nights', validators=[DataRequired()])
     paid_enw = RadioField('Electric / Water', choices=[('Yes','Yes'), ('No', 'No') ] , validators=[DataRequired()])
