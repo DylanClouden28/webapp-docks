@@ -15,7 +15,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
-    logs = db.relationship('Visit')
+    logged_visits = db.relationship('Visit', foreign_keys='Visit.logged_by', back_populates='logged_by_user')
+    paid_visits = db.relationship('Visit', foreign_keys='Visit.payment_by', back_populates='payment_by_user')
 
 class Boat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,6 +44,9 @@ class Boat(db.Model):
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     logged_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    payment_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    logged_by_user = db.relationship('User', foreign_keys=[logged_by], back_populates='logged_visits')
+    payment_by_user = db.relationship('User', foreign_keys=[payment_by], back_populates='paid_visits')
     date_in = db.Column(db.String(150))
     date_paid = db.Column(db.String(150))
     paid_amount = db.Column(db.Float)
@@ -53,6 +57,7 @@ class Visit(db.Model):
     unpaid_days = db.Column(db.Integer)
     unpaid_nights = db.Column(db.Integer)
     total = db.Column(db.Float)
+    unpaid_total = db.Column(db.Float)
     boat_id = db.Column(db.Integer, db.ForeignKey('boat.id'))
 
 class DebtBoats(db.Model):

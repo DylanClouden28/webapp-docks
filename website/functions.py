@@ -2,7 +2,7 @@ from . import db
 from datetime import datetime, timezone
 from flask import Flask, flash, render_template, redirect, url_for
 from flask_login import current_user
-from .models import Boat, CurrentBoats, Visit
+from .models import Boat, CurrentBoats, Visit, User
 from sqlalchemy import or_
 import re
 import pytz
@@ -313,6 +313,10 @@ def edit_payment(visitid, form):
             current_visit.date_paid = utc_result
         except ValueError:
             flash("Bad format for date", category="error")
+
+    if current_visit.logged_by == None:
+        user = User.query.get(int(current_user.id))
+        current_visit.logged_by = user.id
     calcPrice(boat)
     db.session.commit()
 
@@ -334,6 +338,11 @@ def add_payment(current_page, form, boat, id):
     current_visit.paid_with = paid_with
     current_visit.date_paid = datetime.now(timezone.utc)
     calcPrice(boat)
+    user = User.query.get(int(current_user.id))
+    if current_visit.logged_by == None:
+        current_visit.logged_by = user.id
+    if current_visit.payment_by == None:
+        current_visit.payment_by = user.id
     db.session.commit()
 
 def add_visit(current_page, form, boat):
@@ -357,4 +366,16 @@ def add_visit(current_page, form, boat):
     print(current_visit)
     db.session.add(current_visit)
     calcPrice(boat)
+    if current_visit.logged_by == None:
+        user = User.query.get(int(current_user.id))
+        current_visit.logged_by = user.id
     db.session.commit()
+
+def remove_visit(visit_id):
+    current_visit = Visit.query.get(int(visit_id))
+    if current_visit:
+        db.session.delete(current_visit)
+        db.session.commit()
+        flash("Visit deleted succesfully", category='success')
+    else:
+        flash("Tried to delete Visit that doesn't exists", category='error')        

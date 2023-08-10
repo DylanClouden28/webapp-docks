@@ -4,8 +4,8 @@ from flask_wtf import FlaskForm
 from sqlalchemy import or_
 from . import db
 from .models import Boat, CurrentBoats, Visit
-from .forms import BoatLogForm, SearchForm, PaymentForm
-from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key
+from .forms import BoatLogForm, SearchForm, PaymentForm, DeleteVisitForm
+from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key, remove_visit
 import re
 from datetime import datetime, timezone
 
@@ -80,6 +80,7 @@ def log_boat():
 @login_required
 def visits():
     form = PaymentForm()
+    delete_visit_form = DeleteVisitForm()
     button_pressed = request.form.get('submit-button')
     selected_row_id = request.form.get('selectedRowId')
     print("Button pressed is: " + str(button_pressed))
@@ -94,18 +95,28 @@ def visits():
     if not boat:
         flash("Bad Boat ID", category='error')
     if request.method == "POST":
-        if form.validate_on_submit():
-                if button_pressed == "search":
-                    add_payment("visits.html", form, boat, id=selected_row_id)
-        elif button_pressed == "add_new":
-            form.paid_days.data = "0"
-            form.paid_nights.data = "0"
-            form.paid_enw.data = None
-            print("add new visit")
-            add_visit("visits.html", form, boat)
+        if button_pressed == "delete":
+            if delete_visit_form.validate_on_submit():
+                remove_visit_id = delete_visit_form.selecteddeleteRowId.data
+                print("Remove visit ID:", remove_visit_id)
+                remove_visit(remove_visit_id)
+            else:
+                flash("form invalid" + str(form.errors), category="error")
         else:
-            flash("form invalid" + str(form.errors), category="error")
-    return render_template("visits.html", form=form, boat=boat, visits=sorted_visits)
+            if form.validate_on_submit():
+                    if button_pressed == "search":
+                        add_payment("visits.html", form, boat, id=selected_row_id)
+            elif button_pressed == "add_new":
+                form.paid_days.data = "0"
+                form.paid_nights.data = "0"
+                form.paid_enw.data = None
+                print("add new visit")
+                add_visit("visits.html", form, boat)
+            else:
+                flash("form invalid" + str(form.errors), category="error")
+    boat = getBoatById(request.args.get('id', ''))
+    sorted_visits = sorted(boat.visits, key=sort_key, reverse=True)
+    return render_template("visits.html", form=form, boat=boat, visits=sorted_visits, delete_form=delete_visit_form)
 
 @views.route('/update_payment', methods=['POST'])
 def update_payment():

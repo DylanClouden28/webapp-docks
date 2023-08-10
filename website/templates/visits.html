@@ -12,7 +12,7 @@
 {% block content%}
 <style>
   .container {
-      width: 100%;
+      width:  90%;
       padding: 1.25em;
   }
 
@@ -44,9 +44,7 @@
   }
 
   header {
-    display: flex;
-    justify-content: flex-start;
-    padding: 0;
+    padding: 0%;
   }
 
   #add-button-container {
@@ -59,10 +57,13 @@
   #add-button-container img {
       margin-right: 0.625em;
   }
-
+  #content-container{
+    flex-direction: column;
+    align-items: center;
+  }
   #table-container {
     padding-bottom: 1.25em;
-    height: 15em;
+    height: 25em;
     overflow-y: auto;
     background-color: #393e46;
     border-radius: 5px;
@@ -86,6 +87,120 @@
   #search-results tr.highlighted {
     background-color: #2aaeae8e
 }
+
+#deleteDialog {
+  width: 90%;
+  max-width: 600px;
+  margin: auto;
+  background-color: #393e46;
+  border-radius: 5px;
+  padding: 1em;
+  color: #eeeeee;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: scale(0.95);
+  animation: fadeInZoom 0.5s forwards;
+}
+
+@keyframes fadeInZoom {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOutZoom {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+#deleteDialog.closing {
+  animation: fadeOutZoom 0.5s forwards;
+}
+
+#deleteDialog h3 {
+  margin-top: 0;
+  font-size: 1.75em;
+}
+
+#deleteDialog p {
+  margin-bottom: 1em;
+}
+
+#deleteDialog button {
+  padding: 0.5em 1em;
+  margin-right: 0.5em;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#deleteDialog button[type="submit"] {
+  background-color: #f44336;
+  color: #eeeeee;
+}
+
+#deleteDialog button[type="submit"]:hover {
+  background-color: #e13028;
+}
+
+#deleteDialog button[type="button"] {
+  background-color: #222831;
+  color: #eeeeee;
+}
+
+#deleteDialog button[type="button"]:hover {
+  background-color: #1a1d20;
+}
+.radio-container{
+  padding: 0px;
+  margin: 0px;
+}
+.radio-container .form-check-input, 
+.radio-container .form-check-label {
+    font-size: 0.8rem; 
+    margin-right: 5px; 
+    margin-bottom: 0.2em;
+    margin-top: 0em;
+    padding: 0px;
+}
+
+.custom-heading {
+  font-size: 1em;     
+  margin-bottom: 0.5em;
+  margin-top: 0.1em;
+}
+
+#search-container {
+  background-color: rgb(57, 62, 70);
+  border-radius: 5px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  padding: 0.5em;  
+}
+#search-container input {
+  background-color:#4E535A;
+}
+#right-container{ 
+  display: flex;
+  justify-content: center;
+}
+
+#search-container button {
+  padding: 0.7em;
+  margin: 0em;
+}
+
 </style>
 
 
@@ -114,14 +229,16 @@
                     <th>Paid Amount</th>
                     <th>Unpaid Days</th>
                     <th>Unpaid Nights</th>
-                    <th>Total</th>
+                    <th>Paid Total</th>
+                    <th>Unpaid Total</th>
                     <th>Logged By</th>
+                    <th>Payment By</th>
                     <th>Edit</th>
                     </tr>
                 </thead>
                 <tbody> 
                     <tr class="add-blank-visit" id="add-blank-visit">
-                      <td colspan="12">
+                      <td colspan="14">
                           <form method="POST">
                             {{ form.hidden_tag() }}
                             <button type="submit" class="btn btn-primary add-blank-visit-button" name="submit-button" value="add_new">
@@ -136,8 +253,13 @@
                       <form class="edit-form" method="POST" action="{{ url_for('views.update_payment', visitid=visit.id, id=boat.id) }}">
                         {{ form.hidden_tag() }}
                         <td class="editable">
-                          <span class="text">{{ visit.date_in | utc_to_est}}</span>
-                          <input type="text" name="date_in" value="{{ visit.date_in | utc_to_est}}">
+                          <div style="display: flex; align-items: center;">
+                            <button type="button" class="delete-button" data-visitid="{{ visit.id }}">
+                              <img src="static/trash.svg" alt="Delete" width="20" height="20">
+                            </button>
+                            <span class="text">{{ visit.date_in | utc_to_est}}</span>
+                            <input type="text" name="date_in" value="{{ visit.date_in | utc_to_est}}">
+                          </div>
                         </td>
                         <td class="editable">
                           <span class="text">{{ visit.date_paid | utc_to_est}}</span>
@@ -166,15 +288,41 @@
                               <input type="radio" name="paid_with" value="Charge" {% if visit.paid_with == 'Charge' %}checked{% endif %}> Charge
                           </div>           
                           </td>
-                          <td>${{ visit.paid_amount }}0</td>
+                          <td>
+                            {% if visit.paid_amount == None %}
+                              $0
+                            {% else %}
+                              ${{visit.paid_amount}}0
+                            {% endif%}
+                          </td>
                           <td>{{ visit.unpaid_days  }}</td>
                           <td>{{ visit.unpaid_nights }}</td>
-                          <td>${{ visit.total }}0</td>
+                          <td>
+                            {% if visit.total == None %}
+                              $0
+                            {% else %}
+                              ${{visit.total}}0
+                            {% endif%}
+                          </td>
+                          <td>
+                            {% if visit.unpaid_total == None %}
+                              $0
+                            {% else %}
+                              ${{visit.unpaid_total}}0
+                            {% endif%}
+                          </td>
                           <td>
                             {% if visit.logged_by == None %}
                                 None
                             {% else %}
                                 {{ visit.logged_by|userID_to_name }}
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if visit.payment_by == None %}
+                                None
+                            {% else %}
+                                {{ visit.payment_by|userID_to_name }}
                             {% endif %}
                           </td>
                           <td>
@@ -198,60 +346,85 @@
     </div>
 
 
-    <div id="right-container" style="flex: 1;">
-        <div id="search-container">
-          <form method="POST" id="search">
+    <div id="right-container">
+        <form method="POST" id="search">
+          <div id="search-container" style="height: 7em;">
             {{ form.hidden_tag() }}
-            <div class="form-group">
-              {{ form.paid_days.label }}
-              {{ form.paid_days(class="form-control") }}
-            </div>
-            <div class="form-group">
-              {{ form.paid_nights.label }}
-              {{ form.paid_nights(class="form-control") }}
-            </div>
+            
             <div>
-              <h3 class="form-check-input">Using Water or Electric</h3>
-                {% for subfield in form.paid_enw %}
-                    {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
-                {% endfor %}
-            </div>  
-            <div>
-              <h3 class="form-check-input">Payment Method</h3> 
-                {% for subfield in form.paid_with %}
-                    {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
-                {% endfor %}
+                <div class="form-group">
+                    {{ form.paid_days.label }}
+                    {{ form.paid_days(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.paid_nights.label }}
+                    {{ form.paid_nights(class="form-control") }}
+                </div>
             </div>
-            <div id="button-container">
+    
+            <div class="radio-container">
+                <div>
+                    <h4 class="custom-heading">Using Water or Electric</h4>
+                    {% for subfield in form.paid_enw %}
+                        {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+                    {% endfor %}
+                </div>
+    
+                <div>
+                    <h4 class="custom-heading">Payment Method</h4> 
+                    {% for subfield in form.paid_with %}
+                        {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div>
               <div id="button-container">
-                <button type="submit" class="btn btn-primary" id="login-btn" name="submit-button" value="search">
-                  <div id="add-button-container">
-                    <img src="static/more.svg" alt="Add-visit" width="20" height="20"> 
-                    Payment
-                  </div>
+                <button type="submit" class="btn btn-primary" id="login-btn" name="submit-button" value="search" >
+                    <div >
+                        <img src="static/more.svg" alt="Add-visit" width="20" height="20"> 
+                        Payment
+                    </div>
                 </button>
-              </div>
             </div>
+            </div>
+            <div style="clear:both;"></div>
+          </div>
+        </form>
+    
+    
+    
+
+        <dialog id="deleteDialog">
+          <h3>Confirm Delete</h3>
+          <p>Are you sure you want to delete this visit? This will permanently be removed, This data will be unrecoverable!</p>
+          <form method="POST" id="deleteForm">
+              {{ delete_form.hidden_tag() }}
+              <button type="submit" name="submit-button" value="delete">Delete</button>
+              <button type="button" id="cancelButton" >Cancel</button>
           </form>
-        </div>
+        </dialog>
+      
 </div>
 
 <script>
   var editButtons = document.getElementsByClassName("edit-button");
   var addVisitForm = document.getElementById("add-visit");
-  
+    
   // Add click event listener to all edit buttons
   for (var i = 0; i < editButtons.length; i++) {
       editButtons[i].addEventListener("click", function() {
           var row = this.parentElement.parentElement;
           var form = row.getElementsByClassName("edit-form")[0];
           var editables = row.getElementsByClassName("editable");
-  
+          var deleteButton = row.getElementsByClassName("delete-button")[0];
+          
           form.style.display = 'block';
           this.style.display = 'none';
+          deleteButton.style.display = 'inline'; // Show the delete button
           row.getElementsByClassName("cancel-button")[0].style.display = 'block';
           row.getElementsByClassName("save-button")[0].style.display = 'block'; 
-          
+            
           // Loop through editable cells
           for (var j = 0; j < editables.length; j++) {
               var inputs = editables[j].getElementsByTagName('input');
@@ -275,12 +448,14 @@
           var row = this.parentElement.parentElement;
           var form = row.getElementsByClassName("edit-form")[0];
           var editables = row.getElementsByClassName("editable");
-          
+          var deleteButton = row.getElementsByClassName("delete-button")[0];
+            
           form.style.display = 'none';
           this.style.display = 'none';
+          deleteButton.style.display = 'none'; // Hide the delete button
           row.getElementsByClassName("edit-button")[0].style.display = 'block';
           row.getElementsByClassName("save-button")[0].style.display = 'none';
-          
+            
           // Loop through editable cells
           for (var j = 0; j < editables.length; j++) {
               var inputs = editables[j].getElementsByTagName('input');
@@ -297,9 +472,12 @@
       });
   }
   
-  // On page load, hide all input fields in editable cells
+  // On page load, hide all input fields in editable cells and delete buttons
   window.onload = function() {
       var editables = document.getElementsByClassName("editable");
+      var deleteButtons = document.getElementsByClassName("delete-button");
+        
+      // Hide input fields in editable cells
       for (var i = 0; i < editables.length; i++) {
           var inputs = editables[i].getElementsByTagName('input');
           var radioGroups = editables[i].getElementsByClassName('radio-group');
@@ -310,10 +488,15 @@
               radioGroups[j].style.display = 'none';
           }
       }
+      
+      // Hide delete buttons
+      for (var i = 0; i < deleteButtons.length; i++) {
+          deleteButtons[i].style.display = 'none';
+      }
   }
   
-
 </script>
+
 
 
 <script>
@@ -323,7 +506,20 @@
     const submitButton = document.getElementById("login-btn");
     const searchForm = document.getElementById("search");
     const selectedRowIdInput = searchForm.querySelector("#selectedRowId");
+    const deleteButtons = document.querySelectorAll(".delete-button");
+    const deleteDialog = document.getElementById("deleteDialog");
+    const deleteFormInput = document.getElementById("selecteddeleteRowId");
     let selectedRow = null;
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const visitId = e.currentTarget.getAttribute('data-visitid');
+            console.log("Setting delete to: " + visitId);
+            deleteFormInput.value = visitId;  // Set the visit ID in the hidden input field
+            deleteDialog.showModal();  // Show the delete confirmation dialog
+        });
+    });
+  
 
     tableBody.addEventListener("click", function(event) {
         // Get the closest tr element
@@ -353,10 +549,20 @@
     // Initially disable the submit button
     submitButton.disabled = true;
 });
-
-
-
 </script>
+
+<script>
+  document.getElementById('cancelButton').addEventListener('click', function() {
+    var dialog = document.getElementById('deleteDialog');
+    dialog.classList.add('closing');
+  
+    dialog.addEventListener('animationend', function() {
+      dialog.classList.remove('closing');
+      dialog.close();
+    }, { once: true });
+  });
+</script>
+
 
 
 {%endblock%}

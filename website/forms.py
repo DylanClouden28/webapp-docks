@@ -32,6 +32,9 @@ class PaymentForm(FlaskForm):
     paid_with  = RadioField('Payment Method', choices=[('Cash','Cash'), ('Check', 'Check'), ('Charge', 'Charge') ] , validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+class DeleteVisitForm(FlaskForm):
+    selecteddeleteRowId = HiddenField("Field 1")
+
 class SearchForm(FlaskForm):
     boat_reg = StringField('Search Boat Registration')
     boat_name = StringField('Search Boat Name')
