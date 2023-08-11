@@ -250,14 +250,11 @@ def calcPrice(boat):
     sorted_visits = sorted(boat.visits, key=sort_key)
 
     for index, visit in enumerate(sorted_visits):
-        print(index)
         daysTotal = 0
         nightsTotal = 0
         enwTotal = 0
         days = int(visit.paid_days)
         nights = int(visit.paid_nights)
-        print("     days: ",days)
-        print("     nights: ", nights)
         if visit.paid_enw:
             enwTotal = 5
         if size == "0-25":
@@ -279,18 +276,51 @@ def calcPrice(boat):
         if index > 0:
             visit.total = sorted_visits[index - 1].total + visit.paid_amount
         else:
-            print(visit.paid_amount)
             visit.total = visit.paid_amount
+
+    for index, visit in enumerate(sorted_visits):
+        daysTotal = 0
+        nightsTotal = 0
+        enwTotal = 0
+        days = int(visit.unpaid_days)
+        nights = int(visit.unpaid_nights)
+        if visit.paid_enw:
+            enwTotal = 5
+        if size == "0-25":
+            if days > 0:
+                daysTotal = 15 * days
+            if nights > 0:
+                nightsTotal = (25 + enwTotal) * nights
+        elif size == "26-40":
+            if days > 0:
+                daysTotal = 20 * days
+            if nights > 0:
+                nightsTotal = (30 + enwTotal) * nights
+        elif size == "41-Over":
+            if days > 0:
+                daysTotal = 25 * days
+            if nights > 0:
+                nightsTotal = (35 + enwTotal) * nights
+        unpaid_total = -(daysTotal + nightsTotal)
+        if index > 0:
+            visit.unpaid_total = sorted_visits[index - 1].unpaid_total + unpaid_total
+        else:
+            visit.unpaid_total = unpaid_total
 
 def edit_payment(visitid, form):
     sanitize_paid_days = sanitize(form.paid_days.data)
     sanitize_paid_nights = sanitize(form.paid_nights.data)
+
+    sanitize_unpaid_days = sanitize(form.unpaid_days.data)
+    sanitize_unpaid_nights = sanitize(form.unpaid_nights.data)
     paid_enw = form.paid_enw.data
     paid_with = form.paid_with.data
     current_visit = Visit.query.get(visitid)
     boat = getBoatById(current_visit.boat_id)
     current_visit.paid_days = sanitize_paid_days
     current_visit.paid_nights = sanitize_paid_nights
+    current_visit.unpaid_days = sanitize_unpaid_days
+    current_visit.unpaid_nights = sanitize_unpaid_nights
     if paid_enw == "Yes":
         current_visit.paid_enw = True
     else:
@@ -331,6 +361,8 @@ def add_payment(current_page, form, boat, id):
 
     current_visit.paid_days = sanitize_paid_days
     current_visit.paid_nights = sanitize_paid_nights
+    current_visit.unpaid_days = 0
+    current_visit.unpaid_nights = 0
     if paid_enw == "Yes":
         current_visit.paid_enw = True
     else:
@@ -356,6 +388,8 @@ def add_visit(current_page, form, boat):
 
     current_visit.paid_days = sanitize_paid_days
     current_visit.paid_nights = sanitize_paid_nights
+    current_visit.unpaid_days = 0
+    current_visit.unpaid_nights = 0
     if paid_enw == "Yes":
         current_visit.paid_enw = True
     else:

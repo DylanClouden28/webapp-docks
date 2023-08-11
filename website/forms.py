@@ -28,6 +28,8 @@ class PaymentForm(FlaskForm):
     date_paid = StringField('Date Paid', validators=[DataRequired()])
     paid_days = StringField('Paid Days', validators=[DataRequired()])
     paid_nights = StringField('Paid Nights', validators=[DataRequired()])
+    unpaid_days = StringField('Unpaid Days')
+    unpaid_nights = StringField('Unpaid Nights')
     paid_enw = RadioField('Electric / Water', choices=[('Yes','Yes'), ('No', 'No') ] , validators=[DataRequired()])
     paid_with  = RadioField('Payment Method', choices=[('Cash','Cash'), ('Check', 'Check'), ('Charge', 'Charge') ] , validators=[DataRequired()])
     submit = SubmitField('Submit')

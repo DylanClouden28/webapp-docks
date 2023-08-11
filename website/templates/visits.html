@@ -295,8 +295,14 @@
                               ${{visit.paid_amount}}0
                             {% endif%}
                           </td>
-                          <td>{{ visit.unpaid_days  }}</td>
-                          <td>{{ visit.unpaid_nights }}</td>
+                          <td class="editable">
+                            <span class="text">{{ visit.unpaid_days  }}</span>
+                            <input type="text" name="unpaid_days" value="{{ visit.unpaid_days }}">
+                          </td>
+                          <td class="editable">
+                            <span class="text">{{ visit.unpaid_nights  }}</span>
+                            <input type="text" name="unpaid_nights" value="{{ visit.unpaid_nights }}">
+                          </td>
                           <td>
                             {% if visit.total == None %}
                               $0
