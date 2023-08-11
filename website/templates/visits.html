@@ -201,10 +201,23 @@
   margin: 0em;
 }
 
+#login-btn:disabled:hover {
+  background-color: grey !important; 
+  cursor: not-allowed; 
+}
+#login-btn:disabled {
+    opacity: 0.5;
+}
+.red-tint {
+    background-color: rgba(255, 0, 0, 0.2) !important;
+}
+.yellow-tint {
+    background-color: rgba(246, 255, 0, 0.3) !important;
+}
 </style>
 
 
-<div id="boat-info" class="boat-info-container">
+<div id="boat-info" class="boat-info-container {% if visits[0].unpaid_total < 0.0 %}red-tint{% endif %}">
   <a href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number, id=boat.id) }}" id="home-btn">Back</a>
   <div class="boat-info-item"><h3><span><b>Registration:</b> </span><em>{{boat.boat_reg}}</em></h3></div>
   <div class="boat-info-item"><h3><span><b>Name:</b> </span><em>{{boat.boat_name}}</em></h3></div>
@@ -249,7 +262,7 @@
                       </td>
                     </tr>                
                     {% for visit in visits%}
-                    <tr id="row-{{ visit.id }}">
+                    <tr id="row-{{ visit.id }}" {% if visit.unpaid_nights > 0 %}class="red-tint"{%elif visit.unpaid_days > 0%} class="yellow-tint" {% endif %}>
                       <form class="edit-form" method="POST" action="{{ url_for('views.update_payment', visitid=visit.id, id=boat.id) }}">
                         {{ form.hidden_tag() }}
                         <td class="editable">
@@ -506,7 +519,6 @@
 
 
 <script>
-  //Code for adding highlights to rows
   document.addEventListener("DOMContentLoaded", function() {
     const tableBody = document.querySelector("#search-results tbody");
     const submitButton = document.getElementById("login-btn");
@@ -516,45 +528,55 @@
     const deleteDialog = document.getElementById("deleteDialog");
     const deleteFormInput = document.getElementById("selecteddeleteRowId");
     let selectedRow = null;
-    
+
+    // Function to update the appearance of the payment button
+    function updatePaymentButton() {
+        if (selectedRow) {
+            submitButton.disabled = false;
+            submitButton.style.backgroundColor = '';  // Set the original color or any color you prefer
+        } else {
+            submitButton.disabled = true;
+            submitButton.style.backgroundColor = 'grey'; // Set the greyed out color
+        }
+    }
+
     deleteButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             const visitId = e.currentTarget.getAttribute('data-visitid');
             console.log("Setting delete to: " + visitId);
-            deleteFormInput.value = visitId;  // Set the visit ID in the hidden input field
-            deleteDialog.showModal();  // Show the delete confirmation dialog
+            deleteFormInput.value = visitId;
+            deleteDialog.showModal();
         });
     });
-  
 
     tableBody.addEventListener("click", function(event) {
-        // Get the closest tr element
         const clickedRow = event.target.closest("tr");
 
-        // If no tr was found or the tr is the add-blank-visit, return
         if (!clickedRow || clickedRow.classList.contains("add-blank-visit")) return;
 
-        // If a row was previously selected, remove its highlight
-        if (selectedRow) {
-            selectedRow.classList.remove("highlighted");
+        if (selectedRow && clickedRow === selectedRow) {
+            clickedRow.classList.remove("highlighted");
+            selectedRow = null;
+            selectedRowIdInput.value = '';
+        } else {
+            if (selectedRow) {
+                selectedRow.classList.remove("highlighted");
+            }
+            clickedRow.classList.add("highlighted");
+            selectedRow = clickedRow;
+
+            const rowId = clickedRow.id.replace('row-', '');
+            console.log("Setting hidden input to: " + rowId);
+            selectedRowIdInput.value = rowId;
         }
 
-        // Highlight the clicked row
-        clickedRow.classList.add("highlighted");
-        selectedRow = clickedRow;
-
-        // Extract ID from the row's ID attribute and set it to the hidden input
-        const rowId = clickedRow.id.replace('row-', '');
-        console.log("Setting hidden input to: " + rowId);
-        selectedRowIdInput.value = rowId;
-
-        // Enable the submit button
-        submitButton.disabled = false;
+        updatePaymentButton();
     });
 
-    // Initially disable the submit button
-    submitButton.disabled = true;
+    // Initially disable the submit button and set its color
+    updatePaymentButton();
 });
+
 </script>
 
 <script>
