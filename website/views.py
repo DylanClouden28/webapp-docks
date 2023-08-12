@@ -42,6 +42,7 @@ def search():
 @login_required
 def log_boat():
     form = BoatLogForm()
+    sorted_visits = None
     if form.validate_on_submit():
         if request.method == "POST":
             button_pressed = request.form.get('submit-button')
@@ -74,7 +75,9 @@ def log_boat():
            form.owner_name.data = result.owner_name
            form.email.data = result.email
            form.zipcode.data = result.zipcode
-    return render_template("log-boat.html", form=form, boat=result)
+           if result.visits:
+               sorted_visits = sorted(result.visits, key=sort_key, reverse=True)
+    return render_template("log-boat.html", form=form, boat=result, visits=sorted_visits)
 
 @views.route('/visits' , methods=['GET','POST'])
 @login_required

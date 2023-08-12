@@ -376,6 +376,7 @@ def add_payment(current_page, form, boat, id):
     if current_visit.payment_by == None:
         current_visit.payment_by = user.id
     db.session.commit()
+    flash("Successfully added payment!", category='success')
 
 def add_visit(current_page, form, boat):
     sanitize_paid_days = sanitize(form.paid_days.data)

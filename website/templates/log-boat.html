@@ -1,52 +1,122 @@
 {% extends "base.html" %} 
 {% block title %}Log Boat{% endblock %} 
-{%block header%}Log Boat{%endblock%}
-{%block head%}<a href="{{ url_for('views.search') }}"id="home-btn">Back</a>{%endblock%}
+{%block header%}
+{%endblock%}
+{%block body%}
+{%endblock%}
 {%block styles%}static/form-styles.css{%endblock%}
 {% block content%}
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.boat_reg.label }}
-        {{ form.boat_reg(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.boat_name.label }}
-        {{ form.boat_name(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.boat_size.label }}
-    <div>
-        {% for subfield in form.boat_size %}
-            {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
-        {% endfor %}
-    </div>
-    </div>
+<style>
+.info-container{
+    background-color: #393e46;
+    border-radius: 10px;
+    padding: 0.5em;
+}
+.form-control{
+    background-color: #4E535A;
+}
+.title-log-boat{
+    display: flex;
+    align-items: center;
+}
+.title-log-boat h1{
+    padding-left: 1.25em;
+}
+#home-btn{
+    font-size: 1.5em;
+    padding: 0.5em;
+}
+.back-button-container{
+    padding: 2em;
+}
 
+.visit-info-container{
+    background-color: #393e46;
+    border-radius: 10px;
+    padding: 0.5em;
+    margin-bottom: 0.8em;
+}
+.visit-info-item h3, h2 {
+    font-size: 1.125em;
+    color: #eeeeee;
+    font-weight: normal;
+}
+h3.last-visit{
+    font-size: 2em;
+    color: #eeeeee;
+}
+.paid-times{
+    display:inline-flex;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+}
+.paid-times h3{
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+</style>
+<div class="title-log-boat">
+    <a href="{{ url_for('views.search') }}"id="home-btn">Back</a>
+    <h1>Log Boat</h1>
+</div> 
+<div class="visit-info-container">
+    <div class="visit-info-item"><h3><span><b>Last Visit:</b> </span><em>{{visits[0].date_in | utc_to_est_short}}</em></h3></div>
+    <div class="visit-info-item"><h3><span><b>Last Payment:</b> </span><em>{{visits[0].date_paid | utc_to_est_short}}</em></h3></div>
+    <div class="paid-times">
+        <div class="visit-info-item"><h3><span><b>Paid days:</b> </span><em>{{visits[0].paid_days }}</em></h3></div>
+        <div class="visit-info-item"><h3><span><b>Paid nights:</b> </span><em>{{visits[0].paid_nights}}</em></h3></div>
+    </div>
+    {% if visits[0].unpaid_total < 0 %}
+    <div class="paid-times">
+        <div class="visit-info-item"><h3><span><b>Unpaid total:</b> </span><em>${{visits[0].unpaid_total }}0</em></h3></div>
+    </div>
+    {%endif%}
+</div>
+<div class="info-container">
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.boat_reg.label }}
+            {{ form.boat_reg(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.boat_name.label }}
+            {{ form.boat_name(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.boat_size.label }}
+        <div>
+            {% for subfield in form.boat_size %}
+                {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+            {% endfor %}
+        </div>
+        </div>
     
-    <div class="form-group">
-        {{ form.owner_name.label }}
-        {{ form.owner_name(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.phone_number.label }}
-        {{ form.phone_number(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.email.label }}
-        {{ form.email(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.zipcode.label }}
-        {{ form.zipcode(class="form-control") }}
-    </div>
-    {% if boat == None or not boat.current_boats_id %}
-        <button type="submit" class="btn btn-primary" id="login-btn" name="submit-button" value="log">Log Boat</button>
-    {% else %}
-        <button type="submit" class="btn btn-primary" id="update-btn" name="submit-button" value="update">Update Only Info.</button>
-    {% endif %}
-    <button type="submit" class="btn btn-primary" id="update-btn" name="submit-button" value="visits">Visits</button>
-      
-</form>
-
+        
+        <div class="form-group">
+            {{ form.owner_name.label }}
+            {{ form.owner_name(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.phone_number.label }}
+            {{ form.phone_number(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.email.label }}
+            {{ form.email(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.zipcode.label }}
+            {{ form.zipcode(class="form-control") }}
+        </div>
+        {% if boat == None or not boat.current_boats_id %}
+            <button type="submit" class="btn btn-primary" id="login-btn" name="submit-button" value="log">Log Boat</button>
+        {% else %}
+            <button type="submit" class="btn btn-primary" id="update-btn" name="submit-button" value="update">Update Only Info.</button>
+        {% endif %}
+        <button type="submit" class="btn btn-primary" id="update-btn" name="submit-button" value="visits">Visits</button>
+          
+    </form>
+</div>
 {%endblock%}

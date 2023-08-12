@@ -46,6 +46,26 @@ def create_app():
 
         return est_datetime.strftime('%Y-%m-%d %I:%M %p')
     
+    @app.template_filter('utc_to_est_short')
+    def utc_to_est_filter(s):
+        if s == None:
+            return "None"
+        fmt = "%Y-%m-%d %H:%M:%S.%f+00:00"
+        utc_datetime = datetime.strptime(s, fmt)
+        
+        est_tz = pytz.timezone('US/Eastern')
+        est_datetime = utc_datetime.replace(tzinfo=pytz.utc).astimezone(est_tz)
+        
+        month = est_datetime.month
+        day = est_datetime.day
+        year = est_datetime.year % 100  # Using the last two digits of the year
+        
+        hour = est_datetime.strftime('%I').lstrip('0')  # Remove leading zero
+        minute = est_datetime.strftime('%M')
+        time_period = est_datetime.strftime('%p')
+        
+        return f"{month}/{day}   {hour}:{minute}{time_period}"
+    
     @app.template_filter('userID_to_name')
     def userID_to_name(s):
         user = load_user(int(s))
