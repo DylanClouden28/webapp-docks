@@ -242,12 +242,14 @@ def addBoatToDB(current_page, form):
             flash("Boat Already Logged!", category="error")
         return redirect(url_for('views.search'))
 def calcPaidUntil(boat):
-    sorted_visits = sorted(boat.visits, key=sort_key)
+    sorted_visits = sorted(boat.visits, key=sort_key, reverse=True)
     days = sorted_visits[0].paid_days
     nights = sorted_visits[0].paid_nights
     date_paid = sorted_visits[0].date_paid
     if isinstance(date_paid, str):
-        date_paid = datetime.strptime(sorted_visits[0].date_paid, "%Y-%m-%d %H:%M:%S.%f+00:00")
+        date_paid_without_offset = datetime.strptime(sorted_visits[0].date_paid[:-6], "%Y-%m-%d %H:%M:%S.%f")
+        utc_offset = pytz.timezone('UTC').utcoffset(date_paid_without_offset)
+        date_paid = date_paid_without_offset.replace(tzinfo=pytz.UTC) + utc_offset
     paid_until = date_paid + timedelta(days=int(nights))
 
     utc_timezone = pytz.timezone('UTC')
@@ -261,11 +263,11 @@ def calcPaidUntil(boat):
     else:
         hour = 11
         min = 0
-    new_est_time = est_time.replace(hour=hour, minute=min, second=0)
+    new_est_time = est_time.replace(hour=hour, minute=min)
 
     paid_until_utc_time = new_est_time.astimezone(utc_timezone)
-    print(paid_until_utc_time)
-    boat.paid_until = paid_until_utc_time
+    boat.paid_until = paid_until_utc_time.strftime('%Y-%m-%d %H:%M:%S.%f+00:00')
+    print(boat.paid_until)
 
 
 def calcPrice(boat):
@@ -369,13 +371,15 @@ def edit_payment(visitid, form):
             current_visit.date_in = utc_result
         except ValueError:
             flash("Bad format for date", category="error")
-
+    
     if current_visit.date_paid == None:
         current_visit.date_paid = datetime.now(timezone.utc)
     elif not form.date_paid.data == current_visit.date_paid:
         try:
+            print("Current time utc value: ", current_visit.date_paid)
             utc_result = convert_est_to_utc(form.date_paid.data)
             current_visit.date_paid = utc_result
+            print("New time utc value: ", current_visit.date_paid)
         except ValueError:
             flash("Bad format for date", category="error")
 
