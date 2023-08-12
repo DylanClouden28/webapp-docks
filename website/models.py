@@ -41,6 +41,13 @@ class Boat(db.Model):
     visits = db.relationship('Visit', backref='boat')
     current_boats_id = db.Column(db.Integer, db.ForeignKey('current_boats.id'))
 
+    total_paid_days = db.Column(db.Integer)
+    total_paid_nights = db.Column(db.Integer)
+
+    total_unpaid_days = db.Column(db.Integer)
+    total_unpaid_nights = db.Column(db.Integer)
+    paid_until = db.Column(db.String(150))
+
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     logged_by = db.Column(db.Integer, db.ForeignKey('user.id'))

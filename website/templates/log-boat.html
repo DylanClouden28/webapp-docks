@@ -40,6 +40,7 @@
     font-size: 1.125em;
     color: #eeeeee;
     font-weight: normal;
+    margin-top: 0.3em;
 }
 h3.last-visit{
     font-size: 2em;
@@ -55,24 +56,46 @@ h3.last-visit{
     padding-left: 0.5em;
     padding-right: 0.5em;
 }
+.red-tint {
+    background-color: rgba(255, 0, 0, 0.2) !important;
+}
+.yellow-tint {
+    background-color: rgba(251, 255, 20, 0.3) !important;
+}
+.unpaid-total h3, .last-payment h3 , .last-visit h3{
+    margin-bottom: 0;
+}
+.red-tint-text{
+    color: rgba(255, 0, 0, 1) !important;
+}
+.yellow-tint-text{
+    color: rgb(255, 244, 28) !important;
+}
 </style>
 <div class="title-log-boat">
     <a href="{{ url_for('views.search') }}"id="home-btn">Back</a>
     <h1>Log Boat</h1>
-</div> 
-<div class="visit-info-container">
-    <div class="visit-info-item"><h3><span><b>Last Visit:</b> </span><em>{{visits[0].date_in | utc_to_est_short}}</em></h3></div>
-    <div class="visit-info-item"><h3><span><b>Last Payment:</b> </span><em>{{visits[0].date_paid | utc_to_est_short}}</em></h3></div>
+</div>
+{% if not visits == None %} 
+<div class="visit-info-container {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {% endif %}"">
+    <div class="visit-info-item last-visit"><h3><span><b>Last Visit:</b> </span><em>{{visits[0].date_in | utc_to_est_short}}</em></h3></div>
+    {% if not visits[0].date_paid == None %} 
+    <div class="visit-info-item last-payment"><h3><span><b>Last Payment:</b> </span><em>{{visits[0].date_paid | utc_to_est_short}}</em></h3></div>
+    <div class="visit-info-item last-payment"><h3><span><b>Paid Until:</b> </span><em>{{boat.paid_until | utc_to_est_short}}</em></h3></div>
     <div class="paid-times">
         <div class="visit-info-item"><h3><span><b>Paid days:</b> </span><em>{{visits[0].paid_days }}</em></h3></div>
         <div class="visit-info-item"><h3><span><b>Paid nights:</b> </span><em>{{visits[0].paid_nights}}</em></h3></div>
     </div>
-    {% if visits[0].unpaid_total < 0 %}
+    {%endif%}
+    {% if not visits[0].unpaid_total == None and visits[0].unpaid_total < 0 %}
+    <div class="visit-info-item unpaid-total"><h3><span><b>Unpaid total:</b> </span><em>${{visits[0].unpaid_total }}0</em></h3></div>
     <div class="paid-times">
-        <div class="visit-info-item"><h3><span><b>Unpaid total:</b> </span><em>${{visits[0].unpaid_total }}0</em></h3></div>
+        <div class="visit-info-item"><h3><span><b><u>Total unpaid days:</u></b> </span><em >{{boat.total_unpaid_days }}</em></h3></div>
+        <div class="visit-info-item"><h3><span><b><u>Total unpaid nights:</u></b> </span><em>{{boat.total_unpaid_nights }}</em></h3></div>
     </div>
     {%endif%}
 </div>
+{%endif%}
 <div class="info-container">
     <form method="POST">
         {{ form.hidden_tag() }}

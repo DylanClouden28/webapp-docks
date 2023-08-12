@@ -85,7 +85,7 @@
   }
 
   #search-results tr.highlighted {
-    background-color: #2aaeae8e
+    background-color: #2aaeae8e !important;
 }
 
 #deleteDialog {
@@ -217,7 +217,7 @@
 </style>
 
 
-<div id="boat-info" class="boat-info-container {% if visits[0].unpaid_total < 0.0 %}red-tint{% endif %}">
+<div id="boat-info" class="boat-info-container {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {% endif %}">
   <a href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number, id=boat.id) }}" id="home-btn">Back</a>
   <div class="boat-info-item"><h3><span><b>Registration:</b> </span><em>{{boat.boat_reg}}</em></h3></div>
   <div class="boat-info-item"><h3><span><b>Name:</b> </span><em>{{boat.boat_name}}</em></h3></div>
@@ -262,7 +262,7 @@
                       </td>
                     </tr>                
                     {% for visit in visits%}
-                    <tr id="row-{{ visit.id }}" {% if visit.unpaid_nights > 0 %}class="red-tint"{%elif visit.unpaid_days > 0%} class="yellow-tint" {% endif %}>
+                    <tr id="row-{{ visit.id }}" {% if not visit.unpaid_nights == None and visit.unpaid_nights > 0 %}class="red-tint"{%elif not visit.unpaid_days == None and visit.unpaid_days > 0%} class="yellow-tint" {% endif %}>
                       <form class="edit-form" method="POST" action="{{ url_for('views.update_payment', visitid=visit.id, id=boat.id) }}">
                         {{ form.hidden_tag() }}
                         <td class="editable">

@@ -1,5 +1,5 @@
 from . import db
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from flask import Flask, flash, render_template, redirect, url_for
 from flask_login import current_user
 from .models import Boat, CurrentBoats, Visit, User
@@ -241,12 +241,42 @@ def addBoatToDB(current_page, form):
         if not new_visit and boat:
             flash("Boat Already Logged!", category="error")
         return redirect(url_for('views.search'))
+def calcPaidUntil(boat):
+    sorted_visits = sorted(boat.visits, key=sort_key)
+    days = sorted_visits[0].paid_days
+    nights = sorted_visits[0].paid_nights
+    date_paid = sorted_visits[0].date_paid
+    if isinstance(date_paid, str):
+        date_paid = datetime.strptime(sorted_visits[0].date_paid, "%Y-%m-%d %H:%M:%S.%f+00:00")
+    paid_until = date_paid + timedelta(days=int(nights))
+
+    utc_timezone = pytz.timezone('UTC')
+
+    est_tz = pytz.timezone('US/Eastern')
+    est_time = paid_until.astimezone(est_tz)
+
+    if int(days) > 0:
+        hour = 23
+        min = 59
+    else:
+        hour = 11
+        min = 0
+    new_est_time = est_time.replace(hour=hour, minute=min, second=0)
+
+    paid_until_utc_time = new_est_time.astimezone(utc_timezone)
+    print(paid_until_utc_time)
+    boat.paid_until = paid_until_utc_time
+
 
 def calcPrice(boat):
     size = boat.boat_size
     daysTotal = 0
     nightsTotal = 0
     enwTotal = 0
+    boat.total_paid_days = 0
+    boat.total_paid_nights = 0
+    boat.total_unpaid_days = 0
+    boat.total_unpaid_nights = 0
     sorted_visits = sorted(boat.visits, key=sort_key)
 
     for index, visit in enumerate(sorted_visits):
@@ -273,6 +303,9 @@ def calcPrice(boat):
             if nights > 0:
                 nightsTotal = (35 + enwTotal) * nights
         visit.paid_amount = daysTotal + nightsTotal
+        boat.total_paid_days += days
+        boat.total_paid_nights += nights
+
         if index > 0:
             visit.total = sorted_visits[index - 1].total + visit.paid_amount
         else:
@@ -302,11 +335,13 @@ def calcPrice(boat):
             if nights > 0:
                 nightsTotal = (35 + enwTotal) * nights
         unpaid_total = -(daysTotal + nightsTotal)
+        boat.total_unpaid_days += days
+        boat.total_unpaid_nights += nights
         if index > 0:
             visit.unpaid_total = sorted_visits[index - 1].unpaid_total + unpaid_total
         else:
             visit.unpaid_total = unpaid_total
-
+    calcPaidUntil(boat)
 def edit_payment(visitid, form):
     sanitize_paid_days = sanitize(form.paid_days.data)
     sanitize_paid_nights = sanitize(form.paid_nights.data)
