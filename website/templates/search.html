@@ -1,6 +1,8 @@
 {% extends "base.html" %} 
 {% block title %}Search Boats{% endblock %} 
-{%block head%}<a href="{{ url_for('views.home') }}"id="home-btn">Home</a>{%endblock%}
+{%block head%}
+<a href="{{ url_for('views.home') }}"id="home-btn">Home</a>
+{%endblock%}
 {%block header%}{%endblock%}
 {%block styles%}static/search-styles.css{%endblock%}
 {% block content%}
@@ -11,6 +13,143 @@
   .yellow-tint {
       background-color: rgba(251, 255, 20, 0.3) !important;
   }
+  .form-group {
+    margin-bottom: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .form-group label {
+    display: block;
+    color: #eeeeee;
+  }
+  
+  .form-group div {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .form-check-input, .form-check-label {
+    display: inline-block;
+    margin-right: 0.625em;
+  }
+  
+  .form-check-input {
+    width: auto;
+    height: auto;
+  }
+  
+  input[type='radio'] {
+    width: 1.5625em; 
+    height: 1.5625em;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 0.625em;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .form-control {
+    background-color: #393e46;
+    color: #eeeeee;
+  }
+  
+  .form-control::placeholder {
+    color: #adb5bd;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 173, 181, 0.25);
+  }
+  
+  .btn-primary, #update-btn {
+    font-size: 1.5em;
+    background-color: #00adb5;
+    margin: auto;
+    color: #eeeeee;
+    padding: 1.25em 2.5em;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-radius: 5px;
+    margin-bottom: 1.25em;
+  }
+  
+  .btn-primary:hover, #update-btn:hover {
+    background-color: #009e9a;
+    transform: scale(1.05);
+  }
+  
+  .btn-primary:active, #update-btn:active {
+    background-color: #00756e;
+  }
+  
+  #update-btn {
+    font-size: 0.9375em;
+    background-color: #DF740C;
+  }
+  #home-btn {
+    font-size: 1.125em;
+    background-color: #00adb5;
+    color: #eeeeee;
+    padding: 0.625em 0.9375em;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-radius: 5px;
+    display: inline-block;
+    margin-right: 0.3125em;
+  }
+  
+  #home-btn:hover {
+    background-color: #009e9a;
+    transform: scale(1.05);
+  }
+  
+  #home-btn:active {
+    background-color: #00756e;
+  }
+  
+  @keyframes fadein {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+  }
+  #search-container {
+    width: 100%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #search-container form {
+    align-items: center;
+    padding: 0.5em;  
+    border-radius: 5px;
+    background-color: rgb(57, 62, 70);
+  }
+  #search-container input {
+    background-color:#4E535A;
+  }
+  #content-container{
+    flex-direction: column;
+    align-items: center;
+  }
+  #table-no-header{
+    height: 25em;
+    background-color: #393e46;
+  }
+  table {
+    border-radius: 5px;
+  }
+  #left-container{ 
+    display:inline-block;
+    align-items: center;
+  }
+
 </style>
 <div id="main-container">
   
@@ -38,32 +177,34 @@
 
     <div id="table-container">
       <h2>From Database</h2>
-      <table id="search-results">
-        <thead>
-          <tr>
-            <th>Boat Reg.</th>
-            <th>Phone Number</th>
-            <th>Boat Name</th>
-            <th>Visits</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for boat in boats %}
-          <tr class="clickable-row {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {% endif %}" >
-            <td>{{ boat.boat_reg }}</td>
-            <td>{{ boat.phone_number }}</td>
-            <td>{{ boat.boat_name }}</td>
-            <td>
-              <select>
-                {% for visit in boat.visits %}
-                <option>{{ visit }}</option>
-                {% endfor %}
-              </select>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div id="table-no-header">
+        <table id="search-results">
+          <thead>
+            <tr>
+              <th>Boat Reg.</th>
+              <th>Phone Number</th>
+              <th>Boat Name</th>
+              <th>Visits</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for boat in boats %}
+            <tr class="clickable-row {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {%else%}green-tint{% endif %}" >
+              <td>{{ boat.boat_reg }}</td>
+              <td>{{ boat.phone_number }}</td>
+              <td>{{ boat.boat_name }}</td>
+              <td>
+                <select>
+                  {% for visit in boat.visits %}
+                  <option>{{ visit }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
     </div>
   </div>
 
@@ -72,24 +213,26 @@
     <div id="table-container">
       <h2>Today</h2>
       {%if currentboats%}
-      <table id="current-boats">
-        <thead>
-          <tr>
-            <th>Boat Reg.</th>
-            <th>Phone Number</th>
-            <th>Boat Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for boat in currentboats %}
-          <tr class="clickable-row {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {% endif %}" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number,  id=boat.id) }}">
-            <td>{{ boat.boat_reg }}</td>
-            <td>{{ boat.phone_number }}</td>
-            <td>{{ boat.boat_name }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div id="table-no-header">
+        <table id="current-boats">
+          <thead>
+            <tr>
+              <th>Boat Reg.</th>
+              <th>Phone Number</th>
+              <th>Boat Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for boat in currentboats %}
+            <tr class="clickable-row {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {% endif %}" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number,  id=boat.id) }}">
+              <td>{{ boat.boat_reg }}</td>
+              <td>{{ boat.phone_number }}</td>
+              <td>{{ boat.boat_name }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
       {% else %}
       <div id="button-container">
             <button type="submit" form="search" class="btn btn-primary" id="login-btn" name="submit-button" value="add">Add New Boat</button>
