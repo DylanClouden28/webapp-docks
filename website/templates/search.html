@@ -119,6 +119,9 @@
       from { opacity: 0; }
       to   { opacity: 1; }
   }
+
+
+
   #search-container {
     width: 100%; 
     display: flex;
@@ -127,7 +130,7 @@
   }
   #search-container form {
     align-items: center;
-    padding: 0.5em;  
+    padding: 5px;
     border-radius: 5px;
     background-color: rgb(57, 62, 70);
   }
@@ -139,17 +142,21 @@
     align-items: center;
   }
   #table-no-header{
-    height: 25em;
+    height: 20em; 
+    border-radius: 5px;
+    overflow-y: auto;
     background-color: #393e46;
   }
   table {
-    border-radius: 5px;
+    border-collapse: collapse;
   }
   #left-container{ 
     display:inline-block;
     align-items: center;
   }
-
+  #right-container #table-no-header{
+    height: 30em; 
+  }
 </style>
 <div id="main-container">
   
@@ -184,7 +191,6 @@
               <th>Boat Reg.</th>
               <th>Phone Number</th>
               <th>Boat Name</th>
-              <th>Visits</th>
             </tr>
           </thead>
           <tbody>
@@ -193,13 +199,6 @@
               <td>{{ boat.boat_reg }}</td>
               <td>{{ boat.phone_number }}</td>
               <td>{{ boat.boat_name }}</td>
-              <td>
-                <select>
-                  {% for visit in boat.visits %}
-                  <option>{{ visit }}</option>
-                  {% endfor %}
-                </select>
-              </td>
             </tr>
             {% endfor %}
           </tbody>
