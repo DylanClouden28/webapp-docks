@@ -1,15 +1,30 @@
-{% extends "base.html" %} 
-{% block title %}Home{% endblock %} 
-{%block header%}{%endblock%}
-{%block styles%}static/home-styles.css{%endblock%}
-{% block content%}
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block header %}{% endblock %}
+{% block styles %}static/home-styles.css{% endblock %}
+{% block content %}
+<style>
+  .large-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .icon {
+    width: 30%; /* Adjust as needed */
+    height: auto;
+    margin-bottom: 2rem; /* Adjust as needed */
+  }
+</style>
   <div id="container">
-    <a href="{{ url_for('views.search') }}" class="large-btn" id="boatLog">Boat Log</a>
+    <a href="{{ url_for('views.search') }}" class="large-btn" id="boatLog">
+      <img src="static/magnifier.svg" alt="Search Icon" class="icon"> Search Log
+    </a>
     <button class="large-btn">Button 2</button>
     <button class="large-btn">Button 3</button>
     <button class="large-btn">Button 4</button>
     <button class="large-btn">Button 5</button>
     <button class="large-btn">Button 6</button>
   </div>
-{%endblock%}
-
+{% endblock %}
