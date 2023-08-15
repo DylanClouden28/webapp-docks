@@ -47,6 +47,7 @@ class Boat(db.Model):
     total_unpaid_days = db.Column(db.Integer)
     total_unpaid_nights = db.Column(db.Integer)
     paid_until = db.Column(db.String(150))
+    latest_date_in = db.Column(db.String(150))
 
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)

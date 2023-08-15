@@ -117,7 +117,7 @@ def searchBoatInDB(current_page, form):
         resultsToday = CurrentBoats.query.first().boats.all()
         return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
     
-    if not resultsToday or not results:
+    if not resultsToday and not results:
         flash('No Boats Found in Database', category='error')  
     print(results)
     return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
@@ -232,6 +232,8 @@ def addBoatToDB(current_page, form):
         if new_visit:
             new_visit.boat_id = new_boat.id
             db.session.add(new_visit)
+            new_boat.latest_date_in = new_visit.date_in
+            print("Added new Visit, lastest date in: ", new_boat.latest_date_in)
         db.session.commit()
 
         if new_visit:
@@ -241,6 +243,33 @@ def addBoatToDB(current_page, form):
         if not new_visit and boat:
             flash("Boat Already Logged!", category="error")
         return redirect(url_for('views.search'))
+def calc_current_time():
+    Debug = True
+    current_time = datetime.now(timezone.utc)
+    DebugTime = datetime(2023, 8, 15, 21, 36, 59, 342380, tzinfo=timezone.utc)
+    if Debug:
+        current_time = DebugTime
+    print("Current Time is: ", current_time, "| Debug is: ", Debug)
+    return current_time
+
+
+def calcCurrentBoatStatus(boat):
+    current_time = calc_current_time()
+    date_format = "%Y-%m-%d %H:%M:%S.%f%z"
+    latest_date_in = datetime.strptime(boat.latest_date_in, date_format) if boat.latest_date_in else None
+    paid_until = datetime.strptime(boat.paid_until, date_format) if boat.paid_until else None
+    if (boat.total_unpaid_days is not None and boat.total_unpaid_days > 0) or (boat.total_unpaid_nights is not None and boat.total_unpaid_nights > 0):
+        return
+    
+    #If boat is Transient and has not paid remove
+    print("Boat latest time: ", boat.latest_date_in)
+    if not boat.paid_until and (current_time - latest_date_in) > timedelta(hours=2):
+        remove_from_current_Visits(boat.id)
+    #If boat is past it's paid time remove
+    elif boat.paid_until and current_time > paid_until:
+        remove_from_current_Visits(boat.id)
+
+
 def calcPaidUntil(boat):
     sorted_visits = sorted(boat.visits, key=sort_key, reverse=True)
     days = sorted_visits[0].paid_days
@@ -440,11 +469,21 @@ def add_visit(current_page, form, boat):
     print(current_visit)
     db.session.add(current_visit)
     calcPrice(boat)
+    boat.latest_date_in = current_visit.date_in
     if current_visit.logged_by == None:
         user = User.query.get(int(current_user.id))
         current_visit.logged_by = user.id
     db.session.commit()
 
+def remove_from_current_Visits(boat_id):
+    boat = Boat.query.get(boat_id)
+    if boat:
+        boat.current_boats_id = None
+        db.session.commit()
+    else:
+        print("Boat not found!")
+        flash("Tried to remove boat from current boats that doesn't exist", category='error')
+            
 def remove_visit(visit_id):
     current_visit = Visit.query.get(int(visit_id))
     if current_visit:

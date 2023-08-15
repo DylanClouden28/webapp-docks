@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from . import db
 from .models import Boat, CurrentBoats, Visit
 from .forms import BoatLogForm, SearchForm, PaymentForm, DeleteVisitForm
-from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key, remove_visit
+from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key, remove_visit, calcCurrentBoatStatus
 import re
 from datetime import datetime, timezone
 
@@ -34,6 +34,10 @@ def search():
     if CurrentBoats.query.first():
         resultsToday = CurrentBoats.query.first().boats.all()
         print(resultsToday)
+        for boat in resultsToday:
+            calcCurrentBoatStatus(boat)
+        #After checks are made and transients are removed
+        resultsToday = CurrentBoats.query.first().boats.all()
     return render_template('search.html', form=form, boats=results, currentboats=resultsToday)
 
 
