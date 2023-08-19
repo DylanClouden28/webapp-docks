@@ -112,15 +112,17 @@ def searchBoatInDB(current_page, form):
         conditions.append(Boat.sanitized_phone_number.contains(sanitized_phone_number))
     if conditions:
         results = Boat.query.filter(or_(*conditions)).all()
-        resultsToday = CurrentBoats.query.first().boats.filter(or_(*conditions)).all()
+        if CurrentBoats.query.first():
+            resultsToday = CurrentBoats.query.first().boats.filter(or_(*conditions)).all()
     else:
-        resultsToday = CurrentBoats.query.first().boats.all()
+        if CurrentBoats.query.first():
+            resultsToday = CurrentBoats.query.first().boats.all()
         return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
     
     if not resultsToday and not results:
         flash('No Boats Found in Database', category='error')  
     print(results)
-    return render_template(current_page, form=form, boats=results, currentboats=resultsToday)
+    return render_template(current_page, form=form, boats=results, currentboats=resultsToday, )
 
 def BoatInCurrentBoats(form):
     sanitized_boat_reg = sanitize(form.boat_reg.data)
@@ -168,7 +170,8 @@ def getBoatInDB(form):
         return results[0]
     else:
         return []
-
+def str_to_datetime(date_str):
+    return datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S.%f+00:00')
 def addBoatToDB(current_page, form):
     boat_reg = form.boat_reg.data
     boat_name = form.boat_name.data
@@ -215,16 +218,39 @@ def addBoatToDB(current_page, form):
 
         #Adds boat to CurrentBoats with new Visit
         new_visit = None
-        if not BoatInCurrentBoats(form):
+        print("Owes a fee: ", (new_boat.latest_date_in and (calc_current_time().date() == str_to_datetime(new_boat.latest_date_in).date())) and (new_boat.paid_until and (calc_current_time().date() == str_to_datetime(new_boat.paid_until).date())))
+        if not BoatInCurrentBoats(form) and not ( (new_boat.latest_date_in and (calc_current_time().date() == str_to_datetime(new_boat.latest_date_in).date())) and (new_boat.paid_until and (calc_current_time().date() == str_to_datetime(new_boat.paid_until).date()))  ):
             print("Creating New Visit")
             new_boat.current_boats_id = current_boats.id
             new_visit = Visit(
                 logged_by = current_user.id,
-                date_in = datetime.now(timezone.utc),
+                date_in = calc_current_time(),
+                paid_days = 0,
+                paid_nights = 0,
+                unpaid_days = 0,
+                unpaid_nights = 0,
             )
             print(new_visit)
+        elif (new_boat.latest_date_in and (calc_current_time().date() == str_to_datetime(new_boat.latest_date_in).date())) or (new_boat.paid_until and (calc_current_time().date() == str_to_datetime(new_boat.paid_until).date())):
+            new_boat.current_boats_id = current_boats.id
+            sorted_visits = sorted(new_boat.visits, key=sort_key, reverse=True)
+            current_visit = sorted_visits[0]
+            current_time = calc_current_time()
+            if(current_visit.paid_days is not None and current_visit.paid_days > 0) or (current_visit.paid_nights is not None and current_visit.paid_nights > 0):
+                calcPaidUntil(new_boat)
+            date_format = "%Y-%m-%d %H:%M:%S.%f%z"
+            latest_date_in = datetime.strptime(new_boat.latest_date_in, date_format) if new_boat.latest_date_in else None
+            paid_until = datetime.strptime(new_boat.paid_until, date_format) if new_boat.paid_until else None
+
+            if not new_boat.paid_until and (current_time - latest_date_in) > timedelta(hours=2) and (new_boat.latest_date_in and (calc_current_time().date() == str_to_datetime(new_boat.latest_date_in).date())):
+                current_visit.unpaid_days = 1
+            elif new_boat.paid_until and current_time > paid_until and (calc_current_time().date() == str_to_datetime(new_boat.paid_until).date()):
+                current_visit.unpaid_days = 1
+            calcPrice(new_boat)
+            db.session.commit()
+
+            
         printBoat(new_boat)
-        print(current_boats.boats)
         if not boat:
             db.session.add(new_boat)
             db.session.commit()
@@ -233,6 +259,7 @@ def addBoatToDB(current_page, form):
             new_visit.boat_id = new_boat.id
             db.session.add(new_visit)
             new_boat.latest_date_in = new_visit.date_in
+            new_boat.paid_until = None
             print("Added new Visit, lastest date in: ", new_boat.latest_date_in)
         db.session.commit()
 
@@ -246,9 +273,13 @@ def addBoatToDB(current_page, form):
 def calc_current_time():
     Debug = True
     current_time = datetime.now(timezone.utc)
-    DebugTime = datetime(2023, 8, 15, 21, 36, 59, 342380, tzinfo=timezone.utc)
+
+    days_offset = 0
+    hours_offset = 8
+    mins_offset = 0
+
     if Debug:
-        current_time = DebugTime
+        current_time += timedelta(days=days_offset, hours=hours_offset, minutes=mins_offset)
     print("Current Time is: ", current_time, "| Debug is: ", Debug)
     return current_time
 
@@ -263,18 +294,30 @@ def calcCurrentBoatStatus(boat):
     
     #If boat is Transient and has not paid remove
     print("Boat latest time: ", boat.latest_date_in)
+
+    current_boats = CurrentBoats.query.first()
+    if not current_boats:
+        current_boats = CurrentBoats()
+        db.session.add(current_boats)
+            
     if not boat.paid_until and (current_time - latest_date_in) > timedelta(hours=2):
         remove_from_current_Visits(boat.id)
-    #If boat is past it's paid time remove
+        print("Removed Boat from Current Visits: ", boat.id)
+    #If boat is past it's paid time remove 
     elif boat.paid_until and current_time > paid_until:
         remove_from_current_Visits(boat.id)
+        print("Removed Boat from Current Visits: ", boat.id)
 
 
 def calcPaidUntil(boat):
     sorted_visits = sorted(boat.visits, key=sort_key, reverse=True)
     days = sorted_visits[0].paid_days
-    nights = sorted_visits[0].paid_nights
+    nights = sorted_visits[0].paid_nights if sorted_visits[0].paid_nights is not None else 0
     date_paid = sorted_visits[0].date_paid
+    if date_paid is None:
+        return
+    print("Date Paid: ", date_paid)
+    print("Sorted Visit [0] id: ", sorted_visits[0].id)
     if isinstance(date_paid, str):
         date_paid_without_offset = datetime.strptime(sorted_visits[0].date_paid[:-6], "%Y-%m-%d %H:%M:%S.%f")
         utc_offset = pytz.timezone('UTC').utcoffset(date_paid_without_offset)
@@ -314,8 +357,8 @@ def calcPrice(boat):
         daysTotal = 0
         nightsTotal = 0
         enwTotal = 0
-        days = int(visit.paid_days)
-        nights = int(visit.paid_nights)
+        days = int(visit.paid_days) if visit.paid_days is not None else 0
+        nights = int(visit.paid_nights) if visit.paid_nights is not None else 0
         if visit.paid_enw:
             enwTotal = 5
         if size == "0-25":
@@ -346,8 +389,8 @@ def calcPrice(boat):
         daysTotal = 0
         nightsTotal = 0
         enwTotal = 0
-        days = int(visit.unpaid_days)
-        nights = int(visit.unpaid_nights)
+        days = int(visit.unpaid_days) if visit.unpaid_days is not None else 0
+        nights = int(visit.paid_nights) if visit.unpaid_nights is not None else 0
         if visit.paid_enw:
             enwTotal = 5
         if size == "0-25":
@@ -402,7 +445,7 @@ def edit_payment(visitid, form):
             flash("Bad format for date", category="error")
     
     if current_visit.date_paid == None:
-        current_visit.date_paid = datetime.now(timezone.utc)
+        current_visit.date_paid = calc_current_time()
     elif not form.date_paid.data == current_visit.date_paid:
         try:
             print("Current time utc value: ", current_visit.date_paid)
@@ -436,7 +479,7 @@ def add_payment(current_page, form, boat, id):
     else:
         current_visit.paid_enw = False
     current_visit.paid_with = paid_with
-    current_visit.date_paid = datetime.now(timezone.utc)
+    current_visit.date_paid = calc_current_time()
     calcPrice(boat)
     user = User.query.get(int(current_user.id))
     if current_visit.logged_by == None:
@@ -464,7 +507,7 @@ def add_visit(current_page, form, boat):
     else:
         current_visit.paid_enw = False
     current_visit.paid_with = paid_with
-    current_visit.date_in = datetime.now(timezone.utc)
+    current_visit.date_in = calc_current_time()
     current_visit.boat_id = boat.id
     print(current_visit)
     db.session.add(current_visit)

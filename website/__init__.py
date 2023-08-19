@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
-from flask_admin import Admin
+from flask_admin import Admin, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
 from website.config import SECRET_KEY
@@ -78,6 +78,17 @@ def create_app():
     @app.template_filter('reverse')
     def reverse_filter(sequence):
         return reversed(sequence)
+    
+    @app.template_filter('datetime_to_str')
+    def datetime_to_str(datetime):
+        return datetime.strftime('%Y-%m-%d %H:%M:%S.%f+00:00')
+    
+    @app.template_filter('has_paid')
+    def has_paid(boat):
+        from .functions import calc_current_time
+        current_time = calc_current_time()
+        return boat.paid_until and datetime_to_str(current_time) < boat.paid_until
+    
     class MyModel(sqla.ModelView):
       column_display_pk = True
       column_hide_backrefs = False
@@ -90,7 +101,10 @@ def create_app():
             'Current_Boats_list': _list_boats
         }
     
-    admin = Admin(app, name='NT Gateway Harbor', template_mode='bootstrap4')
+    admin = Admin(app, 
+                  name='NT Gateway Harbor', 
+                  template_mode='bootstrap4'
+                )
     admin.add_view(MyModel(User, db.session))
     admin.add_view(MyModel(Boat, db.session))
     admin.add_view(CurrentBoatView(CurrentBoats, db.session))

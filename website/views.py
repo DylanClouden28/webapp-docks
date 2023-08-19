@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from . import db
 from .models import Boat, CurrentBoats, Visit, User
 from .forms import BoatLogForm, SearchForm, PaymentForm, DeleteVisitForm
-from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key, remove_visit, calcCurrentBoatStatus
+from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key, remove_visit, calcCurrentBoatStatus,calc_current_time
 import re
 from datetime import datetime, timezone
 
@@ -38,7 +38,7 @@ def search():
             calcCurrentBoatStatus(boat)
         #After checks are made and transients are removed
         resultsToday = CurrentBoats.query.first().boats.all()
-    return render_template('search.html', form=form, boats=results, currentboats=resultsToday)
+    return render_template('search.html', form=form, boats=results, currentboats=resultsToday, current_time=calc_current_time())
 
 
 
@@ -96,7 +96,7 @@ def visits():
     boat = getBoatById(request.args.get('id', ''))
     sorted_visits = sorted(boat.visits, key=sort_key, reverse=True)
     if button_pressed == "search":
-        form.date_paid.data = datetime.now(timezone.utc) 
+        form.date_paid.data = calc_current_time()
         form.date_in.data = Visit.query.get(selected_row_id).date_in
 
     if not boat:

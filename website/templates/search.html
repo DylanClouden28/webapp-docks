@@ -13,6 +13,9 @@
   .yellow-tint {
       background-color: rgba(251, 255, 20, 0.3) !important;
   }
+  .green-tint {
+    background-color: rgba(0, 255, 38, 0.294) !important;
+}
   .form-group {
     margin-bottom: 1em;
     display: flex;
@@ -195,7 +198,7 @@
           </thead>
           <tbody>
             {% for boat in boats %}
-            <tr class="clickable-row {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {%else%}green-tint{% endif %}" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number,  id=boat.id) }}">
+            <tr class="clickable-row {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {%elif boat | has_paid %}green-tint{% endif %}" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number,  id=boat.id) }}">
               <td>{{ boat.boat_reg }}</td>
               <td>{{ boat.phone_number }}</td>
               <td>{{ boat.boat_name }}</td>
@@ -223,7 +226,7 @@
           </thead>
           <tbody>
             {% for boat in currentboats %}
-            <tr class="clickable-row {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {% endif %}" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number,  id=boat.id) }}">
+            <tr class="clickable-row {% if not boat.total_unpaid_nights == None and boat.total_unpaid_nights > 0 %}red-tint{%elif not boat.total_unpaid_days == None and boat.total_unpaid_days > 0%} yellow-tint {%elif boat | has_paid %}green-tint{% endif %}" data-href="{{ url_for('views.log_boat', boat_reg=boat.boat_reg, boat_name=boat.boat_name, phone_number=boat.phone_number,  id=boat.id) }}">
               <td>{{ boat.boat_reg }}</td>
               <td>{{ boat.phone_number }}</td>
               <td>{{ boat.boat_name }}</td>
