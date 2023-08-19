@@ -3,7 +3,7 @@ from flask_login import login_required
 from flask_wtf import FlaskForm
 from sqlalchemy import or_
 from . import db
-from .models import Boat, CurrentBoats, Visit
+from .models import Boat, CurrentBoats, Visit, User
 from .forms import BoatLogForm, SearchForm, PaymentForm, DeleteVisitForm
 from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key, remove_visit, calcCurrentBoatStatus
 import re

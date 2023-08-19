@@ -1,9 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
 from website.config import SECRET_KEY
 from flask_wtf.csrf import CSRFProtect
+from flask_admin.contrib import sqla
+from flask_admin.base import MenuLink
 from datetime import datetime
 import pytz
 
@@ -16,14 +20,14 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     csrf = CSRFProtect(app)
     db.init_app(app)
-    
+
     from .views import views
     from .auth import auth
 
     app.register_blueprint(views)
     app.register_blueprint(auth)
 
-    from .models import User
+    from .models import User, Boat, CurrentBoats, Visit, DebtBoats
 
     create_database(app)
     login_manager = LoginManager()
@@ -74,6 +78,25 @@ def create_app():
     @app.template_filter('reverse')
     def reverse_filter(sequence):
         return reversed(sequence)
+    class MyModel(sqla.ModelView):
+      column_display_pk = True
+      column_hide_backrefs = False
+
+    class CurrentBoatView(MyModel):
+        column_list = ('id', 'Current_Boats_list')
+        def _list_boats(self, context, model, name):
+            return ", ".join(str(boat.id) for boat in model.boats.all())
+        column_formatters = {
+            'Current_Boats_list': _list_boats
+        }
+    
+    admin = Admin(app, name='NT Gateway Harbor', template_mode='bootstrap4')
+    admin.add_view(MyModel(User, db.session))
+    admin.add_view(MyModel(Boat, db.session))
+    admin.add_view(CurrentBoatView(CurrentBoats, db.session))
+    admin.add_view(MyModel(Visit, db.session))
+    admin.add_view(MyModel(DebtBoats, db.session))
+    admin.add_link(MenuLink(name='Home', url='/', category='Links'))
 
     return app
 
