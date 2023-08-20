@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block header %}{% endblock %}
+{% block styles %}static/home-styles.css{% endblock %}
+{% block content %}
+<h1>
+    {{phone_number}}
+    {{owner}}
+    {{boat_registration}}
+    {{boat_size}}
+</h1>
+<!-- ask if info is correct if not see employee to fix -->
+{% endblock %}
