@@ -275,7 +275,7 @@ def calc_current_time():
     current_time = datetime.now(timezone.utc)
 
     days_offset = 0
-    hours_offset = 8
+    hours_offset = 10
     mins_offset = 0
 
     if Debug:

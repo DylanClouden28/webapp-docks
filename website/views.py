@@ -17,6 +17,10 @@ views = Blueprint('views', __name__)
 def home():
     return render_template("home.html")
 
+@views.route('/checkout')
+def checkout():
+    return render_template('checkout.html')
+
 @views.route('/search', methods=['GET','POST'])
 @login_required
 def search():

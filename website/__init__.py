@@ -23,10 +23,15 @@ def create_app():
 
     from .views import views
     from .auth import auth
+    from .payments import payments
+    from .checkout import checkout
 
     app.register_blueprint(views)
     app.register_blueprint(auth)
-
+    app.register_blueprint(payments)
+    app.register_blueprint(checkout)
+    csrf.exempt(payments)
+    csrf.exempt(checkout)
     from .models import User, Boat, CurrentBoats, Visit, DebtBoats
 
     create_database(app)
@@ -88,6 +93,11 @@ def create_app():
         from .functions import calc_current_time
         current_time = calc_current_time()
         return boat.paid_until and datetime_to_str(current_time) < boat.paid_until
+    
+    @app.errorhandler(400)
+    def handle_400(error):
+        return 'Bad Request: ' + str(error), 400
+
     
     class MyModel(sqla.ModelView):
       column_display_pk = True
