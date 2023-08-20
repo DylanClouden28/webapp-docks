@@ -29,12 +29,10 @@ def webhook():
         print(f"SignatureVerificationError: {e}")
         raise e
 
-    # Handle the event
-    if event['type'] == 'payment_intent.succeeded':
-      payment_intent = event['data']['object']
-      payment_method_types = payment_intent.get('payment_method_types', [])
-      print(f"Payment Method Types: {payment_method_types}")
-    # ... handle other event types
+    if event['type'] == 'checkout.session.completed':
+      payment_checkout = event['data']['object']
+      customer_details = payment_checkout.get("customer_details", [])
+      print(f"Customer Details: {customer_details}")
     else:
       print('Unhandled event type {}'.format(event['type']))
 
