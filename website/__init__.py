@@ -25,11 +25,13 @@ def create_app():
     from .auth import auth
     from .payments import payments
     from .checkout import checkout
+    from .good_payment import good_payment
 
     app.register_blueprint(views)
     app.register_blueprint(auth)
     app.register_blueprint(payments)
     app.register_blueprint(checkout)
+    app.register_blueprint(good_payment)
     csrf.exempt(payments)
     csrf.exempt(checkout)
     from .models import User, Boat, CurrentBoats, Visit, DebtBoats

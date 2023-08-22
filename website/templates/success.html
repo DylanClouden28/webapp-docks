@@ -1,1 +1,23 @@
-<h1>Sucess</h1>
+{% extends "base.html" %} 
+{% block title %}Search Boats{% endblock %} 
+{%block head%}
+{%endblock%}
+{%block header%}{%endblock%}
+{%block styles%}static/search-styles.css{%endblock%}
+{% block content%}
+<h1>Success</h1>
+<p>Checkout Amount Total: ${{ "{:.2f}".format(amount_total / 100) }}</p>
+<ul>
+    {% for item in paid_items %}
+    <li>
+        <p>Description: {{ item.description }}</p>
+        <ul>
+            <li>
+                <p>Quantity: {{ item.quantity }}</p>
+                <p>Item Total: ${{ "{:.2f}".format(item.item_total /100) }}</p>
+            </li>
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
