@@ -534,4 +534,11 @@ def remove_visit(visit_id):
         db.session.commit()
         flash("Visit deleted succesfully", category='success')
     else:
-        flash("Tried to delete Visit that doesn't exists", category='error')        
+        flash("Tried to delete Visit that doesn't exists", category='error')
+
+def get_boat_phone_number(phone_number):
+    results = list()
+    sanitized_phone_number = sanitize(phone_number)
+    #print(Boat.query.filter(Boat.sanitized_phone_number==sanitized_phone_number))
+    results = Boat.query.filter(Boat.sanitized_phone_number==sanitized_phone_number).first()
+    return results
