@@ -4,8 +4,8 @@ from flask_wtf import FlaskForm
 from sqlalchemy import or_
 from . import db
 from .models import Boat, CurrentBoats, Visit, User
-from .forms import BoatLogForm, SearchForm, PaymentForm, DeleteVisitForm
-from .functions import addBoatToDB, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key, remove_visit, calcCurrentBoatStatus,calc_current_time
+from .forms import BoatLogForm, PhoneNumber, PublicLogin, SearchForm, PaymentForm, DeleteVisitForm
+from .functions import addBoatToDB, get_boat_phone_number, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key, remove_visit, calcCurrentBoatStatus,calc_current_time
 import re
 from datetime import datetime, timezone
 
