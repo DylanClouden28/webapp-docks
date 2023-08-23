@@ -142,3 +142,32 @@ def update_payment():
         flash("Invalid form reload or relogin" + str(form.errors), category="error")
         return redirect(url_for('views.visits', id=boat.id))
     
+@views.route('/phone', methods=['POST', 'GET'])
+def phone():
+    phone_number_Form = PhoneNumber()
+    if phone_number_Form.validate_on_submit():
+        num = phone_number_Form.phone_number.data
+        boat = get_boat_phone_number(num)
+        print(num)
+        if boat is None:
+            return redirect(url_for('views.public', phone_number=num))
+        return redirect(url_for('views.pay', phone_number=num))
+    return render_template("phone.html", form=phone_number_Form)
+
+@views.route('/public_login', methods=['POST', 'GET'])
+def public():
+    login_form = BoatLogForm
+    if login_form.validate_on_submit():
+        addBoatToDB(PublicLogin)
+    phone_number = request.args.get('phone_number')
+
+    return render_template("payment.html")
+
+@views.route('/pay', methods=['POST', 'GET'])
+def pay():
+    phone_number = request.args.get('phone_number')
+    boat = get_boat_phone_number(phone_number)
+    boat_registration = boat.boat_reg
+    boat_size = boat.boat_size
+    owner = boat.owner_name
+    return render_template('payment.html', phone_number=phone_number, owner=owner, boat_size=boat_size, boat_registration=boat_registration)
