@@ -19,3 +19,4 @@ def add_payment_to_Boat(boat_id, paid_items):
                 current_visit.paid_days += 1
             elif "Night" in item.description:
                 current_visit.paid_nights += 1
+
