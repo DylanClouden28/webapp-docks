@@ -69,11 +69,15 @@ class PhoneNumber(FlaskForm):
     submit = SubmitField('Submit')
 
 class PublicLogin(FlaskForm):
-    phone_number = StringField('Phone Number', validators=[DataRequired()])
-    boat_reg = StringField('Boat Registration (Doc if Documented with USCG)', validators=[DataRequired()])
-    boat_size = RadioField('Boat Size', choices=[('0-25','25 feet and Under'), ('26-40', '26 feet to 40'), ('41-Over', '41 feet and over')], validate_choice=[DataRequired])
+    boat_reg = StringField('Boat Registration')
     boat_name = StringField('Boat Name (Leave blank if no name)')
+    boat_size = RadioField('Boat Size', choices=[('0-25','25 feet and Under'), ('26-40', '26 feet to 40'), ('41-Over', '41 feet and over') ] , validators=[DataRequired()])
     owner_name = StringField('Name of boat owner', validators=[DataRequired()])
+    phone_number = StringField('Phone Number', validators=[DataRequired()])
+    zipcode = StringField('Zipcode or Postal Code', validators=[DataRequired()])
+    total_nights = RadioField('Total nights', choices=[(0, '0'),(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')], validators=[DataRequired()])
+    day_fee = RadioField('Day fee', choices=[(1, 'Yes'), (0, 'No')], validators=[DataRequired()])
+    water_electric = RadioField('Will you be using water or electric', choices=[(0, 'Yes'), (1, 'No')], validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 class PublicPay(FlaskForm):

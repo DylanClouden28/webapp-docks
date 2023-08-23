@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 import json
 import os
 import stripe
+from .payment_functions import boater_adds_payment
 
 good_payment = Blueprint('good_payment', __name__)
 
@@ -42,6 +43,7 @@ def success():
             paid_items.append(paid_item)
         total=checkout_session.amount_total
         print(paid_items)
+        boater_adds_payment(paid_items, boat_id)
         print("Amount Total", total)
         print("Boat ID: ", boat_id) 
     except Exception as e:

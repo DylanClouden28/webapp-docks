@@ -242,10 +242,10 @@ def addBoatToDB(current_page, form):
             latest_date_in = datetime.strptime(new_boat.latest_date_in, date_format) if new_boat.latest_date_in else None
             paid_until = datetime.strptime(new_boat.paid_until, date_format) if new_boat.paid_until else None
 
-            if not new_boat.paid_until and (current_time - latest_date_in) > timedelta(hours=2) and (new_boat.latest_date_in and (calc_current_time().date() == str_to_datetime(new_boat.latest_date_in).date())):
-                current_visit.unpaid_days = 1
-            elif new_boat.paid_until and current_time > paid_until and (calc_current_time().date() == str_to_datetime(new_boat.paid_until).date()):
-                current_visit.unpaid_days = 1
+            #if not new_boat.paid_until and (current_time - latest_date_in) > timedelta(hours=2) and (new_boat.latest_date_in and (calc_current_time().date() == str_to_datetime(new_boat.latest_date_in).date())):
+            #    current_visit.unpaid_days = 1
+            #elif new_boat.paid_until and current_time > paid_until and (calc_current_time().date() == str_to_datetime(new_boat.paid_until).date()):
+             #   current_visit.unpaid_days = 1
             calcPrice(new_boat)
             db.session.commit()
 
@@ -390,7 +390,7 @@ def calcPrice(boat):
         nightsTotal = 0
         enwTotal = 0
         days = int(visit.unpaid_days) if visit.unpaid_days is not None else 0
-        nights = int(visit.paid_nights) if visit.unpaid_nights is not None else 0
+        nights = int(visit.unpaid_nights) if visit.unpaid_nights is not None else 0
         if visit.paid_enw:
             enwTotal = 5
         if size == "0-25":
@@ -535,6 +535,16 @@ def remove_visit(visit_id):
         flash("Visit deleted succesfully", category='success')
     else:
         flash("Tried to delete Visit that doesn't exists", category='error')
+
+def delete_visit_from_boat(boat_id, visit_id):
+    boat = getBoatById(boat_id)
+    sorted_visits = sorted(boat.visits, key=sort_key, reverse=True)
+    if len(boat.visits) > 1:
+        remove_visit(visit_id)
+        boat.latest_date_in = sorted_visits[0].date_in
+    elif len(boat.visits) == 1:
+        remove_visit(visit_id)
+        boat.latest_date_in = None
 
 def get_boat_phone_number(phone_number):
     results = list()

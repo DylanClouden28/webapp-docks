@@ -3,11 +3,65 @@
 {% block header %}{% endblock %}
 {% block styles %}static/home-styles.css{% endblock %}
 {% block content %}
-<h1>
-    {{phone_number}}
-    {{owner}}
-    {{boat_registration}}
-    {{boat_size}}
-</h1>
-<!-- ask if info is correct if not see employee to fix -->
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.boat_reg.label }}
+        {{ form.boat_reg(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.boat_name.label }}
+        {{ form.boat_name(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.boat_size.label }}
+    <div>
+        {% for subfield in form.boat_size %}
+            {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+        {% endfor %}
+    </div>
+    </div>
+    <div class="form-group">
+        {{ form.owner_name.label }}
+        {{ form.owner_name(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.phone_number.label }}
+        {{ form.phone_number(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.zipcode.label }}
+        {{ form.zipcode(class="form-control") }}
+    </div>
+    
+
+
+    <div class="form-group">
+        {{ form.total_nights.label }}
+    <div>
+        {% for subfield in form.total_nights %}
+            {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+        {% endfor %}
+    </div>
+    </div>
+    <div class="form-group">
+        {{ form.day_fee.label }}
+    <div>
+        {% for subfield in form.day_fee %}
+            {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+        {% endfor %}
+    </div>
+    </div>
+    <div class="form-group">
+        {{ form.water_electric.label }}
+    <div>
+        {% for subfield in form.water_electric %}
+            {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+        {% endfor %}
+    </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="update-btn" name="submit-button" value="visits">Continue To Payment</button>
+      
+</form>
 {% endblock %}

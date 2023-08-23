@@ -8,6 +8,7 @@ from .forms import BoatLogForm, PhoneNumber, PublicLogin, SearchForm, PaymentFor
 from .functions import addBoatToDB, get_boat_phone_number, searchBoatInDB, getBoatInDB, updateBoatInfo, getBoatById, add_payment, edit_payment, add_visit, sort_key, remove_visit, calcCurrentBoatStatus,calc_current_time
 import re
 from datetime import datetime, timezone
+from .payment_functions import addBoatToDB as addBoatPublic
 
 views = Blueprint('views', __name__)
 
@@ -145,23 +146,36 @@ def update_payment():
 @views.route('/phone', methods=['POST', 'GET'])
 def phone():
     phone_number_Form = PhoneNumber()
-    if phone_number_Form.validate_on_submit():
-        num = phone_number_Form.phone_number.data
-        boat = get_boat_phone_number(num)
-        print(num)
-        if boat is None:
-            return redirect(url_for('views.public', phone_number=num))
-        return redirect(url_for('views.pay', phone_number=num))
-    return render_template("phone.html", form=phone_number_Form)
+    if request.method == "POST":
+        if phone_number_Form.validate_on_submit():
+            num = phone_number_Form.phone_number.data
+            boat = get_boat_phone_number(num)
+            print(num)
+            if boat is None:
+                flash("No boat under that phone number", category='error')
+                return render_template("phone.html", form=phone_number_Form , no_render=False)
+            elif boat:
+                return redirect(url_for('views.public', id=boat.id))
+    return render_template("phone.html", form=phone_number_Form, no_render=True)
 
 @views.route('/public_login', methods=['POST', 'GET'])
 def public():
-    login_form = BoatLogForm
-    if login_form.validate_on_submit():
-        addBoatToDB(PublicLogin)
-    phone_number = request.args.get('phone_number')
-
-    return render_template("payment.html")
+    login_form = PublicLogin()
+    if request.method == "POST":
+        if login_form.validate_on_submit():
+            return addBoatPublic(url_for('views.public'), login_form)
+    elif request.method == "GET":
+        phone_number = request.args.get('phone_number','')
+        boat_id = request.args.get('id', '')
+        if boat_id != '':
+            boat = getBoatById(boat_id)
+            login_form.boat_reg.data = boat.boat_reg
+            login_form.boat_name.data = boat.boat_name
+            login_form.boat_size.data = boat.boat_size
+            login_form.phone_number.data = boat.phone_number
+            login_form.zipcode.data = boat.zipcode
+            login_form.owner_name.data = boat.owner_name
+        return render_template("payment.html", form=login_form)
 
 @views.route('/pay', methods=['POST', 'GET'])
 def pay():

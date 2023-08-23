@@ -333,6 +333,8 @@
                           <td>
                             {% if visit.logged_by == None %}
                                 None
+                            {% elif visit.logged_by == 'BOATER' %}
+                                Boater
                             {% else %}
                                 {{ visit.logged_by|userID_to_name }}
                             {% endif %}
@@ -340,6 +342,8 @@
                           <td>
                             {% if visit.payment_by == None %}
                                 None
+                            {% elif visit.logged_by == 'BOATER' %}
+                                Boater
                             {% else %}
                                 {{ visit.payment_by|userID_to_name }}
                             {% endif %}
