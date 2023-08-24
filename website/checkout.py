@@ -114,7 +114,6 @@ def create_checkout_session():
                 #Sets what they are paying for
                 line_items=items,
                 mode='payment',
-                invoice_creation={"enabled": True},
 
                 #URL to redirect to if payment is success
                 success_url=YOUR_DOMAIN + '/success?session_id={CHECKOUT_SESSION_ID}',

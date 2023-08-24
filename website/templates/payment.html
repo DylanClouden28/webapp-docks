@@ -133,6 +133,18 @@
     } else {
         document.getElementById('update-btn').disabled = false;
     }
+    const submitButton = document.getElementById("update-btn");
+        if (dayFeeOption || totalNights !== 0) {
+            submitButton.disabled = false;
+            submitButton.style.backgroundColor = '';  
+        } else {
+            submitButton.disabled = true;
+            submitButton.style.backgroundColor = 'grey'; 
+        }
+    
+
+
+    
     }
     window.onload = calculate;
 </script>

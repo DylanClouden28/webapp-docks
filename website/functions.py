@@ -271,7 +271,7 @@ def addBoatToDB(current_page, form):
             flash("Boat Already Logged!", category="error")
         return redirect(url_for('views.search'))
 def calc_current_time():
-    Debug = True
+    Debug = False
     current_time = datetime.now(timezone.utc)
 
     days_offset = 0
