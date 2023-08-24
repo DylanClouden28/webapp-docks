@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block header %}{% endblock %}
-{% block styles %}static/home-styles.css{% endblock %}
+{% block styles %}static/phone-styles.css{% endblock %}
 
 {% block body%}
 {% if no_render%}
-<div class="dialog-overlay">
+<div class="dialog-overlay" id="dialog-overlay">
     <div class="dialog-box">
         <header>Have you been here before?</header>
         <div class="dialog-buttons">
@@ -17,55 +17,19 @@
 {%endif%}
 {%endblock%}
 {% block content %}
-<style>
-    /* Additional styles for the dialog box */
-    .dialog-overlay {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 9999;
-    }
 
-    .dialog-box {
-        background-color: rgb(54, 70, 104);
-        padding: 20px;
-        text-align: center;
-        border-radius: 10px;
-        max-width: 90%;
-    }
-
-    .dialog-buttons {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-    }
-
-    .dialog-button {
-        margin: 0 10px;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-</style>
-
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.phone_number.label }}
-        {{ form.phone_number(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.submit(class="form-control") }}
-    </div>
-</form>
-
+<div class="form-container">
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.phone_number.label }}
+            {{ form.phone_number(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="form-control") }}
+        </div>
+    </form>
+</div>
 {% if no_render%}
 <script>
     function hideDialog() {

@@ -3,6 +3,7 @@ import json
 import os
 import stripe
 from .payment_functions import boater_adds_payment
+from .functions import getBoatById
 
 good_payment = Blueprint('good_payment', __name__)
 
@@ -17,6 +18,7 @@ def success():
     paid_items = []
     total = None
     session_id = request.args.get('session_id', '')
+    boat = None
 
     #Gets session with id
     try:
@@ -43,10 +45,10 @@ def success():
             paid_items.append(paid_item)
         total=checkout_session.amount_total
         print(paid_items)
+        boat = getBoatById(boat_id)
         boater_adds_payment(paid_items, boat_id)
         print("Amount Total", total)
         print("Boat ID: ", boat_id) 
     except Exception as e:
         print(e)
-        flash("INVALID SESSION ID", category='error')
-    return render_template('success.html', paid_items=paid_items, amount_total=total)
+    return render_template('success.html', paid_items=paid_items, amount_total=total, boat=boat)

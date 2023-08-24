@@ -17,9 +17,9 @@ def boater_adds_payment(paid_items, boat_id):
     if boat:
         for item in paid_items:
             if "Day" in item["description"]:
-                current_visit.paid_days += 1
+                current_visit.paid_days = 1
             elif "Night" in item["description"]:
-                current_visit.paid_nights += int(item["quantity"])
+                current_visit.paid_nights = int(item["quantity"])
             
             if 'E&W' in item["description"]:
                 electric = True
@@ -32,7 +32,6 @@ def boater_adds_payment(paid_items, boat_id):
     if current_visit.payment_by == None:
         current_visit.payment_by = 'Boater'
     db.session.commit()
-    flash("Successfully added payment!", category='success')
 
 def updateBoatInfo(form, boat):
     if not boat.boat_reg:

@@ -1,0 +1,162 @@
+/* Primary Colors */
+:root {
+    --color1: #222831;
+    --color2: #eeeeee;
+    --color3: #252121;
+    --color4: #393e46;
+    --color5: #00adb5;
+  }
+  
+  body {
+    background-color: var(--color1);
+    color: var(--color2);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #content-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 95%;
+  }
+  .container {
+    max-width: 1200px;
+    width: 100%;
+    background-color: var(--color4);
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    margin-top: 20px;
+  }
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .radio-item {
+    margin: 10px 0;
+  }
+  
+  .form-check-input {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Responsive design for medium screens (e.g. tablets) */
+  @media only screen and (max-width: 768px) {
+    .container {
+      width: 95%;
+    }
+
+  }
+  
+  /* Responsive design for small screens (e.g. mobile) */
+  @media only screen and (max-width: 480px) {
+    .container {
+      width: 100%;
+    }
+
+    #boat-size label{
+        font-weight: bold !important;
+        font-size: 15px;
+    }
+
+  
+  }
+
+  
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-control,
+  .btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    background-color: var(--color5);
+    color: var(--color2);
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .btn {
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn:hover {
+    background-color: #009a8a;
+  }
+  
+  #result {
+    padding-top: 10px;
+    padding: 10px;
+    background-color: var(--color3);
+    border-radius: 5px;
+    color: var(--color2);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .alert {
+    background-color: var(--color5);
+    color: var(--color2);
+    padding: 10px;
+    border-radius: 5px;
+    position: relative;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+  }
+  
+  
+  /* Fancy load-in animation */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  body {
+    animation: fadeIn 1s ease-in;
+  }
+
+  .form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  form {
+    text-align: center;
+  }
+  
+  .form-group {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  label {
+    font-weight: bold;
+    padding-top: 10px;
+  }
+
+  .radio-buttons{
+    background-color: var(--color5);
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  

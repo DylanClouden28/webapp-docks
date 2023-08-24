@@ -114,12 +114,10 @@ def create_checkout_session():
                 #Sets what they are paying for
                 line_items=items,
                 mode='payment',
+                invoice_creation={"enabled": True},
 
                 #URL to redirect to if payment is success
                 success_url=YOUR_DOMAIN + '/success?session_id={CHECKOUT_SESSION_ID}',
-
-                #URL to redirect to if payment fails
-                cancel_url=YOUR_DOMAIN + '/cancel',
 
                 #Add Boat ID to pass through stripe
                 client_reference_id = boatid if boatid else None        

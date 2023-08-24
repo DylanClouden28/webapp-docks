@@ -1,0 +1,96 @@
+:root {
+    --color1: #222831;
+    --color2: #eeeeee;
+    --color3: #252121;
+    --color4: #393e46;
+    --color5: #00adb5;
+}
+
+body {
+    background-color: var(--color1);
+    color: var(--color2);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 1s ease-in-out;
+}
+
+#content-container, .form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 95%;
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    background-color: var(--color4);
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    margin-top: 20px;
+}
+
+/* Input and button styles */
+.form-control, .btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    background-color: var(--color5);
+    color: var(--color2);
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.btn {
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+}
+
+.btn:hover {
+    background-color: #009a8a;
+}
+
+/* Responsive design */
+@media only screen and (max-width: 768px), (max-width: 480px) {
+    .container {
+      width: 95%;
+    }
+
+    label {
+        font-size: 15px;
+    }
+}
+
+.dialog-overlay {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.dialog-box {
+    background-color: var(--color4);
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+

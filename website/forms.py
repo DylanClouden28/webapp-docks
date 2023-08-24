@@ -71,7 +71,7 @@ class PhoneNumber(FlaskForm):
 class PublicLogin(FlaskForm):
     boat_reg = StringField('Boat Registration')
     boat_name = StringField('Boat Name (Leave blank if no name)')
-    boat_size = RadioField('Boat Size', choices=[('0-25','25 feet and Under'), ('26-40', '26 feet to 40'), ('41-Over', '41 feet and over') ] , validators=[DataRequired()])
+    boat_size = RadioField('Boat Size', choices=[('0-25','25 ft and Under'), ('26-40', '26 ft to 40'), ('41-Over', '41 ft and over') ] , validators=[DataRequired()])
     owner_name = StringField('Name of boat owner', validators=[DataRequired()])
     phone_number = StringField('Phone Number', validators=[DataRequired()])
     zipcode = StringField('Zipcode or Postal Code', validators=[DataRequired()])

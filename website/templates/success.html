@@ -1,16 +1,166 @@
 {% extends "base.html" %} 
-{% block title %}Search Boats{% endblock %} 
+{% block title %}Success{% endblock %} 
 {%block head%}
 {%endblock%}
 {%block header%}{%endblock%}
-{%block styles%}static/search-styles.css{%endblock%}
+{%block styles%}static/payment-styles.css{%endblock%}
 {% block content%}
-<h1>Success</h1>
-<p>Checkout Amount Total: ${{ "{:.2f}".format(amount_total / 100) }}</p>
+<style>
+    .btn {
+        transition: background-color 0.5s ease; /* Increase transition time for smoother effect */
+      }
+      
+      .btn:hover {
+        background-color: #009a8a; /* Subtle color change */
+      }
+      
+      /* Fancy load-in animation */
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      body {
+        animation: fadeIn 1s ease-in-out; /* Add slight movement to fade-in */
+      }
+      
+      /* Responsive design */
+      @media only screen and (max-width: 768px), (max-width: 480px) {
+        .container {
+          width: 95%;
+          /* Other necessary mobile/tablet adjustments */
+        }
+        label {
+          font-size: 15px; /* Adjust font size for smaller screens */
+        }
+      }
+
+      h1 {
+        color: var(--color5);
+        text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        font-size: 36px;
+        text-align: center;
+        margin-top: 20px;
+        font-weight: bold;
+      }
+      
+       #total-text {
+        color: var(--color2);
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin: 10px 0;
+      }
+      p#total{
+        color: var(--color2);
+        font-size: 24px;
+        text-align: center;
+        margin: 10px 0;
+      }
+      
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      
+      li {
+        padding: 10px;
+        background-color: var(--color3);
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        margin: 10px 0;
+      }
+      
+      li p {
+        margin: 5px 0;
+      }
+      
+      li ul {
+        margin: 10px;
+      }
+      
+      li ul li {
+        background-color: var(--color4);
+        padding: 10px;
+        border-radius: 5px;
+      }
+      
+      #content-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 95%;
+      }
+
+      a {
+        text-align: center;
+        display: block;
+        font-weight: bold;
+        font-style: italic;
+        color: var(--color2);
+        text-decoration: none;
+        margin: 20px auto;
+        padding: 10px;
+        border-radius: 5px;
+        width: 30%;
+        background-color: var(--color5);
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+      }
+      
+      a:hover {
+        background-color: #047267;
+      }
+
+      #link-button{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .boat-info-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        background: var(--color3);
+        padding: 1.25em;
+        margin-bottom: 1.25em;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    }
+  
+    .boat-info-item {
+        flex: 1;
+        text-align: center;
+        margin: 0 0.3125em;
+    }
+  
+    .boat-info-item h3, h2 {
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        font-size: 1.125em;
+        color: #eeeeee;
+        font-weight: normal;
+    }
+</style>
+<h1>Successful Payment</h1>
+<p id="total"><span id="total-text">Amount Total:</span> <em>${{ "{:.2f}".format(amount_total / 100) }}</em></p>
+{%if boat%}
+<p id="total"><span id="total-text">Paid Till:</span> <em>{{ boat.paid_until | utc_to_est_short}}</em></p>
+{%endif%}
+
+<div id="boat-info" class="boat-info-container">
+    <div class="boat-info-item"><h3><span><b>Reg:</b> </span><em>{{boat.boat_reg}}</em></h3></div>
+    <div class="boat-info-item"><h3><span><b>Name:</b> </span><em>{{boat.boat_name}}</em></h3></div>
+    <div class="boat-info-item"><h3><span><b>Size:</b> </span><em>{{boat.boat_size}}</em></h3></div>
+    <div class="boat-info-item"><h3><span><b>Owner:</b> </span><em>{{boat.owner_name}}</em></h3></div>
+    <div class="boat-info-item"><h3><span><b>Phone:</b> </span><em>{{boat.phone_number}}</em></h3></div>
+  </div>
+
 <ul>
     {% for item in paid_items %}
     <li>
-        <p>Description: {{ item.description }}</p>
+        <p>Item: {{ item.description }}</p>
         <ul>
             <li>
                 <p>Quantity: {{ item.quantity }}</p>
@@ -20,4 +170,8 @@
     </li>
     {% endfor %}
 </ul>
+
+<div id="link-button">
+<a href="{{url_for('views.public')}}">Place Another Order</a>
+</div>
 {% endblock %}

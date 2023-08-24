@@ -1,67 +1,139 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block header %}{% endblock %}
-{% block styles %}static/home-styles.css{% endblock %}
+{% block styles %}static/payment-styles.css{% endblock %}
 {% block content %}
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.boat_reg.label }}
-        {{ form.boat_reg(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.boat_name.label }}
-        {{ form.boat_name(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.boat_size.label }}
-    <div>
-        {% for subfield in form.boat_size %}
-            {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
-        {% endfor %}
-    </div>
-    </div>
-    <div class="form-group">
-        {{ form.owner_name.label }}
-        {{ form.owner_name(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.phone_number.label }}
-        {{ form.phone_number(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.zipcode.label }}
-        {{ form.zipcode(class="form-control") }}
-    </div>
-    
+<div class="form-container">
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.boat_reg.label }}
+            {{ form.boat_reg(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.boat_name.label }}
+            {{ form.boat_name(class="form-control") }}
+        </div>
+        <div id="booking-form">
+            <div class="form-group">
+                {{ form.boat_size.label }}
+            <div class="radio-buttons" id="boat-size">
+                {% for subfield in form.boat_size %}
+                    {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+                {% endfor %}
+            </div>
+            </div>
+            <div class="form-group">
+                {{ form.owner_name.label }}
+                {{ form.owner_name(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.phone_number.label }}
+                {{ form.phone_number(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.zipcode.label }}
+                {{ form.zipcode(class="form-control") }}
+            </div>
+            
 
+            <div class="form-group">
+                {{ form.total_nights.label }}
+            <div class="radio-buttons">
+                {% for subfield in form.total_nights %}
+                    {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+                {% endfor %}
+            </div>
+            </div>
+            <div class="form-group">
+                {{ form.day_fee.label }}
+            <div class="radio-buttons" >
+                {% for subfield in form.day_fee %}
+                    {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+                {% endfor %}
+            </div>
+            </div>
+            <div class="form-group">
+                {{ form.water_electric.label }}
+            <div class="radio-buttons">
+                {% for subfield in form.water_electric %}
+                    {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
+                {% endfor %}
+            </div>
+            </div>
+        </div>
+        <div id="result">
+            <p>Total cost: $<span id="total_cost">0</span></p>
+            <p>Paid until date: <span id="paid_until_date">-</span></p>
+            <p>Paid until time: <span id="paid_until_time">-</span></p>
+        </div>
 
-    <div class="form-group">
-        {{ form.total_nights.label }}
-    <div>
-        {% for subfield in form.total_nights %}
-            {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
-        {% endfor %}
-    </div>
-    </div>
-    <div class="form-group">
-        {{ form.day_fee.label }}
-    <div>
-        {% for subfield in form.day_fee %}
-            {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
-        {% endfor %}
-    </div>
-    </div>
-    <div class="form-group">
-        {{ form.water_electric.label }}
-    <div>
-        {% for subfield in form.water_electric %}
-            {{ subfield(class="form-check-input") }} {{ subfield.label(class="form-check-label") }}
-        {% endfor %}
-    </div>
-    </div>
+        <button type="submit" class="btn btn-primary" id="update-btn" name="submit-button" value="visits"><b>Continue To Payment</b></button>
+        
+    </form>
+</div>
 
-    <button type="submit" class="btn btn-primary" id="update-btn" name="submit-button" value="visits">Continue To Payment</button>
-      
-</form>
+<script>
+    document.getElementById('booking-form').addEventListener('change', calculate);
+    function calculate() {
+        
+        var size = document.querySelector('input[name="boat_size"]:checked').value;
+        var totalNights = parseInt(document.querySelector('input[name="total_nights"]:checked').value);
+        var dayFeeOption = parseInt(document.querySelector('input[name="day_fee"]:checked').value);
+        var waterElectricOption = parseInt(document.querySelector('input[name="water_electric"]:checked').value);
+        
+        var dayFee = 0;
+        var nightFee = 0;
+
+        switch (size) {
+            case "0-25":
+                dayFee = 15;
+                nightFee = waterElectricOption === 0 ? 30 : 25;
+                break;
+            case "26-40":
+                dayFee = 20;
+                nightFee = waterElectricOption === 0 ? 35 : 30;
+                break;
+            case "41-Over":
+                dayFee = 25;
+                nightFee = waterElectricOption === 0 ? 40 : 35;
+                break;
+        }
+
+        var totalCost = dayFee * dayFeeOption + nightFee * totalNights;
+        document.getElementById('total_cost').innerText = totalCost;
+
+        
+        var paidUntil = new Date();
+    if (dayFeeOption && totalNights === 0) {
+        paidUntil.setHours(23, 59, 59);
+    } else {
+        paidUntil.setDate(paidUntil.getDate() + totalNights);
+        paidUntil.setHours(11, 0, 0);
+        if (dayFeeOption) {
+            paidUntil.setDate(paidUntil.getDate());
+            paidUntil.setHours(23, 59, 59);
+        }
+    }
+
+    var paidUntilDate = (paidUntil.getMonth() + 1) + "/" + paidUntil.getDate();
+    var hours = paidUntil.getHours();
+    var minutes = paidUntil.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    var paidUntilTime = hours + ':' + minutes + ' ' + ampm;
+
+    document.getElementById('paid_until_date').innerText = paidUntilDate;
+    document.getElementById('paid_until_time').innerText = paidUntilTime;
+
+    if (dayFeeOption === 0 && totalNights === 0) {
+        document.getElementById('update-btn').disabled = true;
+    } else {
+        document.getElementById('update-btn').disabled = false;
+    }
+    }
+    window.onload = calculate;
+</script>
 {% endblock %}
