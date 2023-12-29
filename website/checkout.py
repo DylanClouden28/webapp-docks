@@ -6,7 +6,7 @@ import stripe
 
 checkout = Blueprint('checkout', __name__)
 
-stripe.api_key = 'sk_test_51NgydBFLI0YQxiReRUGcliWrU3V2a3VoRzzH0DIU4rUyJrWGNAWkzBfQ8SUQ5OsHna5ioy42uchhRLoJ2KoewiD8000KtpTA3N'
+stripe.api_key = ''
 
 YOUR_DOMAIN = 'http://localhost:5000'
 
