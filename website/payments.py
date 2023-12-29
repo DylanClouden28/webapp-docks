@@ -5,10 +5,10 @@ import stripe
 
 payments = Blueprint('payments', __name__)
 
-stripe.api_key = "sk_test_51NgydBFLI0YQxiReRUGcliWrU3V2a3VoRzzH0DIU4rUyJrWGNAWkzBfQ8SUQ5OsHna5ioy42uchhRLoJ2KoewiD8000KtpTA3N"
+stripe.api_key = ""
 
 # This is your Stripe CLI webhook secret for testing your endpoint locally.
-endpoint_secret = 'whsec_3fe49ac1502fb2910b856262e11429e8fabde90e6b5f68c6b96e02701f318700'
+endpoint_secret = ''
 
 @payments.route('/webhook', methods=['POST'])
 def webhook():
